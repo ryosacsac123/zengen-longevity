@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (session.error) {
                         alert(session.error);
                     } else {
-                        const stripe = Stripe('pk_test_51T2O42CIeY3gcYhGkZtdXfbV10dY3oSab427HhxpDMOgiJH5Bz4xv2ca9EcZL9n4b3glMqu9Ut4G4FzaVXeB2A4800F45yTQwx');
+                        const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
                         return stripe.redirectToCheckout({ sessionId: session.id });
                     }
                 })

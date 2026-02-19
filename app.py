@@ -4,7 +4,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', stripe_publishable_key=os.environ.get('STRIPE_PUBLISHABLE_KEY', 'pk_test_51T2O42CIeY3gcYhGkZtdXfbV10dY3oSab427HhxpDMOgiJH5Bz4xv2ca9EcZL9n4b3glMqu9Ut4G4FzaVXeB2A4800F45yTQwx'))
 
 @app.route('/api/calculate_score', methods=['POST'])
 def calculate_score():
