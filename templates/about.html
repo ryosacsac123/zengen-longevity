@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About ZenGen Longevity AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* Specific overrides for About Page */
+        body {
+            overflow-y: auto;
+            /* Allow scrolling */
+            background-color: #0a0a0a;
+        }
+
+        .about-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1 {
+            color: #99ff00;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        section {
+            margin-bottom: 3rem;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+
+        h2 {
+            color: #99ff00;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            line-height: 1.6;
+            color: #cccccc;
+            margin-bottom: 1rem;
+        }
+
+        .citation {
+            font-style: italic;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 4rem;
+            color: #99ff00;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 4rem;
+            color: #555;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="about-container">
+        <h1>About the Project</h1>
+
+        <section>
+            <h2>1. Our Mission</h2>
+            <p>ZenGen Longevity AI was founded to bridge the gap between traditional Japanese longevity wisdom and
+                modern genomic science. We translate data-driven insights into actionable, personalized bio-hacking
+                protocols for a global audience.</p>
+        </section>
+
+        <section>
+            <h2>2. The Science Behind ZenGen</h2>
+            <p>Our analysis is rooted in the Japanese Diet Index (JDI8) research. We specifically focus on the unique
+                biological advantages found in the Japanese population, such as the 'Porphyranase' enzyme discovered in
+                gut microbes (<em>Bacteroides plebeius</em>), which allows for the efficient digestion of marine
+                polysaccharides.</p>
+            <p class="citation">(Reference: Nature, 2010; Hehemann et al., Transfer of carbohydrate-active enzymes from
+                marine bacteria to Japanese gut microbiota)</p>
+        </section>
+
+        <section>
+            <h2>3. The Team</h2>
+            <p>The project is led by a Graduate Researcher at Hokkaido University, specializing in Environmental
+                Engineering. By combining environmental data analysis with longevity science, we aim to provide the most
+                scientifically rigorous wellness guidance available.</p>
+        </section>
+
+        <section>
+            <h2>4. Affiliate Disclosure</h2>
+            <p>To support our ongoing research, we participate in affiliate programs (e.g., Amazon Associates). We only
+                recommend high-quality products that align with our scientific protocols.</p>
+        </section>
+
+        <a href="/" class="back-link">← Return to Home</a>
+
+        <footer>
+            &copy; 2026 ZenGen Longevity AI. All Rights Reserved.
+        </footer>
+    </div>
+
+</body>
+
+</html>

@@ -108,6 +108,10 @@ def create_checkout_session():
 def success():
     return render_template('success.html')
 
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
 @app.route('/download-report')
 def download_report():
     # Retrieve score from session, default to 0 if not found
