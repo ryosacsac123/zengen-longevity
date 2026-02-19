@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZenGen Longevity</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+
+<body>
+    <div id="canvas-container"></div>
+
+    <div id="ui-layer">
+        <div id="landing-content">
+            <h1 class="fade-in">ZenGen Longevity</h1>
+            <p class="subtitle fade-in-delay">Unlock the Centenarian Code with Japanese Biohacking</p>
+            <button id="start-btn" class="cta-button fade-in-delay-2">Start Longevity Audit</button>
+        </div>
+
+        <div id="diagnostic-form" class="hidden">
+            <h2>JDI8 Diagnostic</h2>
+            <p>Select the items you consume <strong>above the average median</strong> (High Intake):</p>
+            <form id="audit-form">
+                <div class="checkbox-group">
+                    <label><input type="checkbox" name="rice"> Rice (At least once a day)</label>
+                    <label><input type="checkbox" name="miso_soup"> Miso Soup (At least once a day)</label>
+                    <label><input type="checkbox" name="seaweed"> Seaweed (At least 3-4 times a week)</label>
+                    <label><input type="checkbox" name="pickles"> Pickles (At least 3-4 times a week)</label>
+                    <label><input type="checkbox" name="green_yellow_veg"> Green/Yellow Vegetables (At least once a
+                        day)</label>
+                    <label><input type="checkbox" name="fish"> Fish (At least 3-4 times a week)</label>
+                    <label><input type="checkbox" name="green_tea"> Green Tea (At least once a day)</label>
+                    <hr>
+                    <p>Select if you consume <strong>High Intake</strong>:</p>
+                    <label><input type="checkbox" name="beef_pork"> Beef / Pork (At least 3-4 times a week)</label>
+                    <small>For Beef/Pork, "High Intake" is considered negative for longevity in JDI8.</small>
+                </div>
+                <button type="submit" class="cta-button">Calculate Score</button>
+            </form>
+            <p class="disclaimer">This is not medical advice.</p>
+        </div>
+
+        <div id="results-view" class="hidden">
+            <h2>Your Longevity Score</h2>
+            <div id="score-display">0 / 8</div>
+            <p id="risk-reduction"></p>
+
+            <div class="locked-insights">
+                <h3>Premium Insights 🔒</h3>
+                <div class="locked-item">Your personalized NMN dosage based on weight and age</div>
+                <div class="locked-item">Specific Japanese fermentation source for your microbiome</div>
+                <div class="locked-item">Optimal fasting window for your metabolic type</div>
+            </div>
+
+            <div id="breakdown"></div>
+
+            <hr style="border-color: rgba(255,255,255,0.1); margin: 2rem 0;">
+
+            <p class="teaser-text">Unlock these insights and get your full 1-week personalized longevity plan for just
+                $5.</p>
+            <button id="buy-btn" class="gold-button">Get Personalized Plan for $5</button>
+
+            <br><br>
+
+            <details class="methodology-accordion">
+                <summary>Scientific Methodology & Evidence</summary>
+                <div class="methodology-content">
+                    <h3>8-item Japanese Diet Index (JDI8)</h3>
+                    <p><strong>Source:</strong> <em>JPHC Study (Journal of Epidemiology, 2016)</em> - "Association
+                        between the Japanese Diet Index and Total Mortality".</p>
+                    <p><strong>Evidence:</strong> Based on data from approximately 90,000 men and women aged 40-69
+                        followed for an average of 18.9 years.</p>
+                    <p class="highlight">The group with high JDI8 scores had a <strong>14% lower risk of all-cause
+                            mortality</strong> and an <strong>11% lower risk of cardiovascular disease
+                            mortality</strong>.</p>
+
+                    <h3>Gut Microbiome & Seaweed</h3>
+                    <p><strong>Source:</strong> <em>Nature (2010), Hehemann et al.</em> - "Transfer of
+                        carbohydrate-active enzymes from marine bacteria to Japanese gut microbiota".</p>
+                    <p><strong>Insight:</strong> Japanese individuals possess unique gut bacteria with porphyranase
+                        enzymes to digest seaweed efficiently, a trait acquired from marine bacteria.</p>
+                </div>
+            </details>
+
+            <br>
+            <button id="restart-btn" class="secondary-button"
+                style="background:transparent; border:1px solid #666; color:#ccc;">Restart Audit</button>
+
+            <p class="disclaimer">This is not medical advice.</p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/physics.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>
