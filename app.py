@@ -359,8 +359,8 @@ def download_report():
     current_y -= 0.4 * inch
     
     # Store Links
-    link_matcha = "https://ippodotea.com/collections/matcha"
-    link_nori = "https://www.amazon.com/s?k=japanese+nori" # Placeholder
+    link_matcha = "https://amzn.to/3OqrkJE"
+    link_nori = "https://amzn.to/3MmatHs"
     link_nmn = "https://www.amazon.com/s?k=japanese+nmn"
     
     # Helper to draw linked item
@@ -402,7 +402,7 @@ def download_report():
     current_y = draw_linked_item(c, margin_left, current_y, 
         "Zojirushi IH Cooker", 
         "The foundation of a healthy metabolism. GABA activation mode.", 
-        "https://www.amazon.com/zojirushi")
+        "https://amzn.to/3Oq6KZZ")
 
     current_y -= 0.5 * inch
     c.setFont("Helvetica-Bold", 18)
