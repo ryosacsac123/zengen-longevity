@@ -67,8 +67,11 @@ from io import BytesIO
 import stripe
 import os
 import datetime
+from dotenv import load_dotenv
 
-stripe.api_key = 'sk_test_51T2O42CIeY3gcYhG44MEFhktxud9dyCefvemMvsF93PY5zFtQQTliQcaZqDeHjdqPvoyF9sPcm5YjhPDg07yqIGf00uRvq3EuB'
+load_dotenv() # Load environment variables from .env if present
+
+stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
 DOMAIN = 'http://localhost:5000'
 
 latest_score = 0 # Global variable for MVP score persistence
