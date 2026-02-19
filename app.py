@@ -72,7 +72,9 @@ from dotenv import load_dotenv
 load_dotenv() # Load environment variables from .env if present
 
 stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
-DOMAIN = 'http://localhost:5000'
+# Use BASE_URL from env, or default to Render URL for production
+DOMAIN = os.environ.get('BASE_URL', 'https://zengen-longevity.onrender.com')
+print(f"Server starting with DOMAIN: {DOMAIN}")
 
 latest_score = 0 # Global variable for MVP score persistence
 
