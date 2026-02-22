@@ -17,6 +17,7 @@ app = Flask(__name__)
 stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
 DOMAIN = os.environ.get('BASE_URL', 'https://zengen-longevity.onrender.com')
 
+# 最新の5点スタック
 LINKS = {
     "matcha": "https://amzn.to/3OqrkJE",
     "nmn": "https://www.iherb.com/c/nmn?rcode=YOUR_CODE",
@@ -72,34 +73,48 @@ def download_report():
     styleN = styles["BodyText"]
     styleN.textColor, styleN.fontSize, styleN.leading = colors.white, 8, 10
 
-    # --- PAGE 1 ---
+    # --- PAGE 1: PREMIUM DESIGN ---
     c.setFillColorRGB(0.05, 0.05, 0.05)
     c.rect(0, 0, width, height, fill=True)
     c.setStrokeColor(accent)
     c.setLineWidth(2)
     c.line(margin, height - 1.2*inch, width - margin, height - 1.2*inch)
-    
-    # Header
     c.setFont("Helvetica-Bold", 14)
     c.setFillColor(colors.white)
     c.drawString(margin, height - 1.0*inch, "OFFICIAL LONGEVITY BLUEPRINT")
 
     # Score Circle
     c.setStrokeColor(accent)
-    c.circle(width/2, height - 2.4*inch, 0.6*inch, stroke=1, fill=0)
-    c.setFont("Helvetica-Bold", 28)
-    c.drawCentredString(width/2, height - 2.5*inch, f"{user_score}/8")
-    c.setFont("Helvetica-Bold", 9)
+    c.circle(width/2, height - 2.3*inch, 0.55*inch, stroke=1, fill=0)
+    c.setFont("Helvetica-Bold", 26)
+    c.drawCentredString(width/2, height - 2.4*inch, f"{user_score}/8")
+    c.setFont("Helvetica-Bold", 8)
     c.setFillColor(accent)
-    c.drawCentredString(width/2, height - 3.2*inch, "JDI8 SCORE")
+    c.drawCentredString(width/2, height - 3.0*inch, "JDI8 SCORE")
 
-    # 1. RISK ASSESSMENT (復活 & 視認性向上)
+    # Risk Assessment (ここで復活！)
     risk = "LOW" if user_score > 6 else "MODERATE" if user_score > 3 else "HIGH"
-    c.setFont("Helvetica-Bold", 11)
+    c.setFont("Helvetica-Bold", 10)
     c.setFillColor(colors.white)
-    c.drawCentredString(width/2, height - 3.6*inch, f"RISK ASSESSMENT: {risk}")
+    c.drawCentredString(width/2, height - 3.3*inch, f"RISK ASSESSMENT: {risk}")
 
-    # パーソナライズロジック
+    # 01 Bio-Marker Analysis
+    c.setFont("Helvetica-Bold", 11)
+    c.setFillColor(accent)
+    c.drawString(margin, height - 3.7*inch, "01 // BIO-MARKER ANALYSIS")
+    c.setFont("Helvetica", 8.5)
+    c.setFillColor(colors.white)
+    c.drawString(margin + 0.2*inch, height - 3.9*inch, f"- Foundational Carbs: {'Optimal' if user_score > 5 else 'Sub-optimal'}.")
+
+    # 02 Genetic Edge (復活！)
+    c.setFont("Helvetica-Bold", 11)
+    c.setFillColor(accent)
+    c.drawString(margin, height - 4.3*inch, "02 // THE JAPANESE GENETIC EDGE")
+    c.setFont("Helvetica", 8.5)
+    c.setFillColor(colors.white)
+    c.drawString(margin + 0.2*inch, height - 4.5*inch, "Nature (2010): Porphyranase enzyme pathway identified for seaweed processing.")
+
+    # パーソナライズド・プロトコル
     if user_score <= 3:
         p_mon = "Start 12h fast. Focus on Miso hydration."
         p_wed = "Add Seaweed to one meal. Activate enzymes."
@@ -113,18 +128,18 @@ def download_report():
     # 03 Protocol Table
     c.setFont("Helvetica-Bold", 11)
     c.setFillColor(accent)
-    c.drawString(margin, height - 4.1*inch, "03 // PERSONALIZED 1-WEEK PROTOCOL")
+    c.drawString(margin, height - 4.9*inch, "03 // PERSONALIZED PROTOCOL")
     data = [
         ['Day', 'Focus', 'Action'],
         ['Mon', 'Autophagy', Paragraph(p_mon, styleN)],
         ['Tue', 'Microbiome', Paragraph('Natto/Okra. Feed the mucosa layer.', styleN)],
         ['Wed', 'Enzyme', Paragraph(p_wed, styleN)],
         ['Thu', 'Recovery', Paragraph('2g Ippodo Matcha. L-Theanine spike.', styleN)],
-        ['Fri', 'Omega-3', Paragraph('Fatty fish / EPA-DHA. Cognitive boost.', styleN)],
+        ['Fri', 'Omega-3', Paragraph('Fatty fish / EPA-DHA supplement.', styleN)],
         ['Sat', 'Metabolism', Paragraph('HIIT Session. Activate glycolysis.', styleN)],
         ['Sun', 'Rest', Paragraph('Hot Bath / Sauna. HSP activation.', styleN)]
     ]
-    table = Table(data, colWidths=[0.7*inch, 1.1*inch, 4.4*inch], rowHeights=0.4*inch)
+    table = Table(data, colWidths=[0.7*inch, 1.1*inch, 4.4*inch], rowHeights=0.38*inch)
     table.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), accent),
         ('TEXTCOLOR', (0,0), (-1,0), colors.black),
@@ -132,8 +147,8 @@ def download_report():
         ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
         ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
         ('ALIGN', (0,0), (-1,-1), 'CENTER'),
-        ('FONTSIZE', (0,0), (-1,-1), 8),
-    ]))
+        ('FONTSIZE', (0,0), (-1,-1), 7.5),
+    ])) # ← image_21ba51.png のカッコ閉じ忘れエラーを修正
     table.wrapOn(c, width, height)
     table.drawOn(c, margin, height - 8.2*inch)
 
