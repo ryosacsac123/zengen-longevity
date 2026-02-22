@@ -17,7 +17,6 @@ app = Flask(__name__)
 stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
 DOMAIN = os.environ.get('BASE_URL', 'https://zengen-longevity.onrender.com')
 
-# 最新の5点スタック
 LINKS = {
     "matcha": "https://amzn.to/3OqrkJE",
     "nmn": "https://www.iherb.com/c/nmn?rcode=YOUR_CODE",
@@ -92,54 +91,55 @@ def download_report():
     c.setFillColor(accent)
     c.drawCentredString(width/2, height - 3.0*inch, "JDI8 SCORE")
 
-    # Risk Assessment (ここで復活！)
+    # RISK ASSESSMENT (スコアの下に配置)
     risk = "LOW" if user_score > 6 else "MODERATE" if user_score > 3 else "HIGH"
     c.setFont("Helvetica-Bold", 10)
     c.setFillColor(colors.white)
     c.drawCentredString(width/2, height - 3.3*inch, f"RISK ASSESSMENT: {risk}")
 
-    # 01 Bio-Marker Analysis
-    c.setFont("Helvetica-Bold", 11)
+    # 02 Genetic Edge (復活)
+    c.setFont("Helvetica-Bold", 10)
     c.setFillColor(accent)
-    c.drawString(margin, height - 3.7*inch, "01 // BIO-MARKER ANALYSIS")
-    c.setFont("Helvetica", 8.5)
+    c.drawString(margin, height - 3.7*inch, "02 // THE JAPANESE GENETIC EDGE")
+    c.setFont("Helvetica", 8)
     c.setFillColor(colors.white)
-    c.drawString(margin + 0.2*inch, height - 3.9*inch, f"- Foundational Carbs: {'Optimal' if user_score > 5 else 'Sub-optimal'}.")
+    c.drawString(margin + 0.2*inch, height - 3.9*inch, "Nature (2010): Porphyranase enzyme pathway identified for marine processing.")
 
-    # 02 Genetic Edge (復活！)
-    c.setFont("Helvetica-Bold", 11)
-    c.setFillColor(accent)
-    c.drawString(margin, height - 4.3*inch, "02 // THE JAPANESE GENETIC EDGE")
-    c.setFont("Helvetica", 8.5)
-    c.setFillColor(colors.white)
-    c.drawString(margin + 0.2*inch, height - 4.5*inch, "Nature (2010): Porphyranase enzyme pathway identified for seaweed processing.")
-
-    # パーソナライズド・プロトコル
-    if user_score <= 3:
-        p_mon = "Start 12h fast. Focus on Miso hydration."
-        p_wed = "Add Seaweed to one meal. Activate enzymes."
-    elif user_score <= 6:
-        p_mon = "16:8 Fasting. Break with Miso & Seaweed."
+    # 全曜日のパーソナライズロジック
+    if user_score <= 3: # 初級
+        p_mon = "Hydration focus. Start with Miso soup to reset."
+        p_tue = "Eat Natto at dinner to support mucosa."
+        p_wed = "Add a small Seaweed side to your lunch."
+        p_fri = "Omega-3: Take 1g EPA/DHA supplement."
+        p_sun = "Focus on 20min hot soak to activate HSP."
+    elif user_score <= 6: # 中級
+        p_mon = "16:8 Fasting. Break fast with Miso & Seaweed."
+        p_tue = "Microbiome Diversity: Mix Natto with Okra/Kimchi."
         p_wed = "Seaweed Salad. Activate Porphyranase enzyme."
-    else:
+        p_fri = "Fatty fish (Salmon/Saba) + 1g supplement."
+        p_sun = "Hot Bath + 5min cold shower for recovery."
+    else: # 上級
         p_mon = "18:6 Fasting. Advanced EGCG flux optimization."
-        p_wed = "Diversity loading: 3+ types of Seaweed & Fibers."
+        p_tue = "Symbiotic loading: Fermented foods + Prebiotic fibers."
+        p_wed = "Diversity loading: 3+ types of Seaweed & Sea vegetables."
+        p_fri = "High-grade Sashimi. Precision Omega-3 timing."
+        p_sun = "Sauna + Ice Bath (Full HSP/Cold-shock activation)."
 
     # 03 Protocol Table
-    c.setFont("Helvetica-Bold", 11)
+    c.setFont("Helvetica-Bold", 10)
     c.setFillColor(accent)
-    c.drawString(margin, height - 4.9*inch, "03 // PERSONALIZED PROTOCOL")
+    c.drawString(margin, height - 4.3*inch, "03 // PERSONALIZED PROTOCOL")
     data = [
         ['Day', 'Focus', 'Action'],
         ['Mon', 'Autophagy', Paragraph(p_mon, styleN)],
-        ['Tue', 'Microbiome', Paragraph('Natto/Okra. Feed the mucosa layer.', styleN)],
+        ['Tue', 'Microbiome', Paragraph(p_tue, styleN)],
         ['Wed', 'Enzyme', Paragraph(p_wed, styleN)],
-        ['Thu', 'Recovery', Paragraph('2g Ippodo Matcha. L-Theanine spike.', styleN)],
-        ['Fri', 'Omega-3', Paragraph('Fatty fish / EPA-DHA supplement.', styleN)],
+        ['Thu', 'Recovery', Paragraph('2g Ippodo Matcha. Prioritize L-Theanine.', styleN)],
+        ['Fri', 'Omega-3', Paragraph(p_fri, styleN)],
         ['Sat', 'Metabolism', Paragraph('HIIT Session. Activate glycolysis.', styleN)],
-        ['Sun', 'Rest', Paragraph('Hot Bath / Sauna. HSP activation.', styleN)]
+        ['Sun', 'Rest', Paragraph(p_sun, styleN)]
     ]
-    table = Table(data, colWidths=[0.7*inch, 1.1*inch, 4.4*inch], rowHeights=0.38*inch)
+    table = Table(data, colWidths=[0.7*inch, 1.1*inch, 4.4*inch], rowHeights=0.4*inch)
     table.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), accent),
         ('TEXTCOLOR', (0,0), (-1,0), colors.black),
@@ -148,7 +148,7 @@ def download_report():
         ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
         ('ALIGN', (0,0), (-1,-1), 'CENTER'),
         ('FONTSIZE', (0,0), (-1,-1), 7.5),
-    ])) # ← image_21ba51.png のカッコ閉じ忘れエラーを修正
+    ]))
     table.wrapOn(c, width, height)
     table.drawOn(c, margin, height - 8.2*inch)
 
