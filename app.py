@@ -17,7 +17,6 @@ app = Flask(__name__)
 stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
 DOMAIN = os.environ.get('BASE_URL', 'http://localhost:5000')
 
-# アフィリエイトリンク（最新の5点スタック）
 LINKS = {
     "matcha": "https://amzn.to/3OqrkJE",
     "nmn": "https://www.iherb.com/c/nmn?rcode=YOUR_CODE",
@@ -67,13 +66,13 @@ def download_report():
     c = canvas.Canvas(buffer, pagesize=letter)
     width, height = letter
     margin = 1.0 * inch
-    accent = colors.HexColor("#99ff00") # ネオングリーン
+    accent = colors.HexColor("#99ff00")
 
     styles = getSampleStyleSheet()
     styleN = styles["BodyText"]
     styleN.textColor, styleN.fontSize, styleN.leading = colors.white, 8, 10
 
-    # --- PAGE 1: PREMIUM DESIGN ---
+    # --- PAGE 1: FULL BLUEPRINT ---
     c.setFillColorRGB(0.05, 0.05, 0.05)
     c.rect(0, 0, width, height, fill=True)
     
@@ -88,65 +87,69 @@ def download_report():
     c.setFont("Helvetica", 8)
     c.drawRightString(width - margin, height - 1.0*inch, f"ID: {report_id} | {datetime.date.today()}")
 
-    # Score Circle (X/8表記)
+    # Score Circle
     c.setStrokeColor(accent)
-    c.circle(width/2, height - 2.5*inch, 0.7*inch, stroke=1, fill=0)
-    c.setFont("Helvetica-Bold", 32)
-    c.drawCentredString(width/2, height - 2.6*inch, f"{user_score}/8")
-    c.setFont("Helvetica-Bold", 10)
+    c.circle(width/2, height - 2.4*inch, 0.6*inch, stroke=1, fill=0)
+    c.setFont("Helvetica-Bold", 28)
+    c.drawCentredString(width/2, height - 2.5*inch, f"{user_score}/8")
+    c.setFont("Helvetica-Bold", 9)
     c.setFillColor(accent)
-    c.drawCentredString(width/2, height - 3.4*inch, "JDI8 SCORE")
+    c.drawCentredString(width/2, height - 3.2*inch, "JDI8 SCORE")
 
-    # Risk Assessment (Premium要素)
-    risk = "LOW" if user_score > 6 else "MODERATE" if user_score > 3 else "HIGH"
+    # Section 01: Bio-Marker Analysis
     c.setFont("Helvetica-Bold", 11)
+    c.drawString(margin, height - 3.6*inch, "01 // BIO-MARKER ANALYSIS")
+    c.setFont("Helvetica", 8.5)
     c.setFillColor(colors.white)
-    c.drawCentredString(width/2, height - 3.9*inch, f"RISK REDUCTION: {risk}")
-
-    # Section 01: Analysis
-    c.setFont("Helvetica-Bold", 12)
-    c.setFillColor(accent)
-    c.drawString(margin, height - 4.3*inch, "01 // BIO-MARKER ANALYSIS")
-    c.setFont("Helvetica", 9)
-    c.setFillColor(colors.white)
-    y = height - 4.6*inch
-    findings = [
-        f"- Rice & Miso: {'Optimal' if user_score > 5 else 'Sub-optimal'}. Foundational carbs.",
-        f"- Seaweed: {'Optimal' if user_score > 4 else 'Review required'}. Enzyme activation.",
-        "- Green Tea: Levels are Critical. Boost EGCG intake."
+    y = height - 3.85*inch
+    analysis_points = [
+        f"- Foundational Carbs: {'Optimal' if user_score > 5 else 'Sub-optimal'}.",
+        f"- Seaweed Enzyme Activation: {'High' if user_score > 4 else 'Low'}.",
+        "- Green Tea EGCG Intake: Critical for cellular repair."
     ]
-    for line in findings:
+    for line in analysis_points:
         c.drawString(margin + 0.2*inch, y, line)
-        y -= 0.2*inch
+        y -= 0.18*inch
 
-    # 1-Week Protocol Table
-    c.setFont("Helvetica-Bold", 12)
+    # Section 02: Genetic Edge (復活！)
+    c.setFont("Helvetica-Bold", 11)
     c.setFillColor(accent)
-    c.drawString(margin, y - 0.3*inch, "03 // 1-WEEK PROTOCOL")
+    c.drawString(margin, y - 0.1*inch, "02 // THE JAPANESE GENETIC EDGE")
+    c.setFont("Helvetica-Oblique", 8.5)
+    c.setFillColor(colors.white)
+    c.drawString(margin + 0.2*inch, y - 0.3*inch, "Genetic Insight: Bacteroides plebeius")
+    c.setFont("Helvetica", 8.5)
+    c.drawString(margin + 0.2*inch, y - 0.5*inch, "Nature (2010) identifies your unique Porphyranase enzyme pathway.")
+    y = y - 0.65*inch
+
+    # Section 03: Protocol Table
+    c.setFont("Helvetica-Bold", 11)
+    c.setFillColor(accent)
+    c.drawString(margin, y - 0.1*inch, "03 // 1-WEEK PROTOCOL")
     data = [
         ['Day', 'Focus', 'Action'],
-        ['Mon', 'Autophagy', Paragraph('16:8 Fasting. Break fast with Miso.', styleN)],
-        ['Tue', 'Microbiome', Paragraph('Natto/Okra dinner. Feed the mucosa.', styleN)],
+        ['Mon', 'Autophagy', Paragraph('16:8 Fasting. Break with Miso.', styleN)],
+        ['Tue', 'Microbiome', Paragraph('Natto/Okra. Feed the mucosa.', styleN)],
         ['Wed', 'Enzyme', Paragraph('Seaweed Salad. Activate Porphyranase.', styleN)],
-        ['Thu', 'Recovery', Paragraph('2g Ippodo Matcha. Prioritize L-Theanine.', styleN)],
-        ['Fri', 'Omega-3', Paragraph('Fatty fish or EPA/DHA supplement.', styleN)],
-        ['Sat', 'Metabolism', Paragraph('High Intensity Interval Training.', styleN)],
+        ['Thu', 'Recovery', Paragraph('2g Ippodo Matcha. L-Theanine spike.', styleN)],
+        ['Fri', 'Omega-3', Paragraph('Fatty fish / EPA-DHA supplement.', styleN)],
+        ['Sat', 'Metabolism', Paragraph('HIIT Session. Activate glycolysis.', styleN)],
         ['Sun', 'Rest', Paragraph('Hot Bath / Sauna. HSP activation.', styleN)]
     ]
-    table = Table(data, colWidths=[0.7*inch, 1.1*inch, 4.4*inch], rowHeights=0.45*inch)
+    table = Table(data, colWidths=[0.7*inch, 1.1*inch, 4.4*inch], rowHeights=0.4*inch)
     table.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), accent),
         ('TEXTCOLOR', (0,0), (-1,0), colors.black),
         ('TEXTCOLOR', (0,1), (-1,-1), colors.white),
-        ('FONTNAME', (0,0), (-1,-1), 'Helvetica-Bold'),
         ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
         ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
         ('ALIGN', (0,0), (-1,-1), 'CENTER'),
-    ])) # ← image_21ba51.png のエラー箇所を確実に修正
+        ('FONTSIZE', (0,0), (-1,-1), 8),
+    ]))
     table.wrapOn(c, width, height)
-    table.drawOn(c, margin, y - 0.6*inch - (0.45*inch * 8))
+    table.drawOn(c, margin, y - 0.4*inch - (0.4*inch * 8))
 
-    c.showPage() # --- PAGE 2: THE GOLD STANDARD STACK ---
+    c.showPage() # --- PAGE 2 ---
     c.setFillColorRGB(0.05, 0.05, 0.05)
     c.rect(0, 0, width, height, fill=True)
     c.setStrokeColor(accent)
@@ -157,13 +160,12 @@ def download_report():
     c.drawString(margin, height - 1.8*inch, "04 // THE GOLD STANDARD STACK")
     
     y = height - 2.3*inch
-    # 商品リストを「最新の5点」に固定
     stack = [
-        ("Ippodo Matcha", LINKS['matcha'], "Finest L-Theanine source for neuro-protection."),
-        ("Suntory NMN", LINKS['nmn'], "99.9% purity for DNA repair and cellular energy."),
+        ("Ippodo Matcha", LINKS['matcha'], "Finest L-Theanine for neuro-protection."),
+        ("Suntory NMN", LINKS['nmn'], "99.9% purity for DNA cellular repair."),
         ("Spermidine", LINKS['spermidine'], "Autophagy inducer for cellular health."),
-        ("EPA / DHA", LINKS['omega3'], "1-2g daily for systemic inflammation control."),
-        ("Zojirushi IH", LINKS['cooker'], "Metabolism foundation. GABA activation mode.")
+        ("EPA / DHA", LINKS['omega3'], "1-2g daily for inflammation control."),
+        ("Zojirushi IH", LINKS['cooker'], "Metabolism foundation. GABA mode.")
     ]
     for title, link, desc in stack:
         c.setFont("Helvetica-Bold", 10)
