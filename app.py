@@ -17,6 +17,7 @@ app = Flask(__name__)
 stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
 DOMAIN = os.environ.get('BASE_URL', 'https://zengen-longevity.onrender.com')
 
+# 最新の5点スタック
 LINKS = {
     "matcha": "https://amzn.to/3OqrkJE",
     "nmn": "https://www.iherb.com/c/nmn?rcode=YOUR_CODE",
@@ -72,9 +73,11 @@ def download_report():
     styleN = styles["BodyText"]
     styleN.textColor, styleN.fontSize, styleN.leading = colors.white, 8, 10
 
-    # --- PAGE 1 ---
+    # --- PAGE 1: FULL BLUEPRINT ---
     c.setFillColorRGB(0.05, 0.05, 0.05)
     c.rect(0, 0, width, height, fill=True)
+    
+    # Header
     c.setStrokeColor(accent)
     c.setLineWidth(2)
     c.line(margin, height - 1.2*inch, width - margin, height - 1.2*inch)
@@ -84,16 +87,44 @@ def download_report():
     
     # Score Circle
     c.setStrokeColor(accent)
-    c.circle(width/2, height - 2.4*inch, 0.6*inch, stroke=1, fill=0)
-    c.setFont("Helvetica-Bold", 28)
-    c.drawCentredString(width/2, height - 2.5*inch, f"{user_score}/8")
-    c.setFont("Helvetica-Bold", 9)
+    c.circle(width/2, height - 2.3*inch, 0.55*inch, stroke=1, fill=0)
+    c.setFont("Helvetica-Bold", 26)
+    c.drawCentredString(width/2, height - 2.4*inch, f"{user_score}/8")
+    c.setFont("Helvetica-Bold", 8)
     c.setFillColor(accent)
-    c.drawCentredString(width/2, height - 3.2*inch, "JDI8 SCORE")
+    c.drawCentredString(width/2, height - 3.0*inch, "JDI8 SCORE")
 
-    # Table
-    data = [['Day', 'Focus', 'Action'], ['Mon', 'Autophagy', Paragraph('16:8 Fasting. Break with Miso.', styleN)], ['Tue', 'Microbiome', Paragraph('Natto/Okra. Feed the mucosa.', styleN)], ['Wed', 'Enzyme', Paragraph('Seaweed Salad. Activate Porphyranase.', styleN)], ['Thu', 'Recovery', Paragraph('2g Ippodo Matcha. L-Theanine spike.', styleN)], ['Fri', 'Omega-3', Paragraph('Fatty fish / EPA-DHA supplement.', styleN)], ['Sat', 'Metabolism', Paragraph('HIIT Session. Activate glycolysis.', styleN)], ['Sun', 'Rest', Paragraph('Hot Bath / Sauna. HSP activation.', styleN)]]
-    table = Table(data, colWidths=[0.7*inch, 1.1*inch, 4.4*inch], rowHeights=0.4*inch)
+    # 01 Analysis
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(margin, height - 3.4*inch, "01 // BIO-MARKER ANALYSIS")
+    c.setFont("Helvetica", 8)
+    c.setFillColor(colors.white)
+    c.drawString(margin + 0.2*inch, height - 3.6*inch, f"- Foundational Carbs: {'Optimal' if user_score > 5 else 'Sub-optimal'}.")
+    c.drawString(margin + 0.2*inch, height - 3.75*inch, "- Seaweed & Miso: Crucial for microbiome flux.")
+
+    # 02 Genetic Edge (復活！)
+    c.setFont("Helvetica-Bold", 10)
+    c.setFillColor(accent)
+    c.drawString(margin, height - 4.1*inch, "02 // THE JAPANESE GENETIC EDGE")
+    c.setFont("Helvetica", 8)
+    c.setFillColor(colors.white)
+    c.drawString(margin + 0.2*inch, height - 4.3*inch, "Nature (2010): Porphyranase enzyme pathway identified.")
+
+    # 03 Protocol Table (崩れを修正)
+    c.setFont("Helvetica-Bold", 10)
+    c.setFillColor(accent)
+    c.drawString(margin, height - 4.7*inch, "03 // 1-WEEK PROTOCOL")
+    data = [
+        ['Day', 'Focus', 'Action'],
+        ['Mon', 'Autophagy', Paragraph('16:8 Fasting. Break with Miso.', styleN)],
+        ['Tue', 'Microbiome', Paragraph('Natto/Okra. Feed the mucosa.', styleN)],
+        ['Wed', 'Enzyme', Paragraph('Seaweed Salad. Activate Porphyranase.', styleN)],
+        ['Thu', 'Recovery', Paragraph('2g Ippodo Matcha. L-Theanine spike.', styleN)],
+        ['Fri', 'Omega-3', Paragraph('Fatty fish / EPA-DHA supplement.', styleN)],
+        ['Sat', 'Metabolism', Paragraph('HIIT Session. Activate glycolysis.', styleN)],
+        ['Sun', 'Rest', Paragraph('Hot Bath / Sauna. HSP activation.', styleN)]
+    ]
+    table = Table(data, colWidths=[0.7*inch, 1.1*inch, 4.4*inch], rowHeights=0.38*inch)
     table.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), accent),
         ('TEXTCOLOR', (0,0), (-1,0), colors.black),
@@ -101,12 +132,12 @@ def download_report():
         ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
         ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
         ('ALIGN', (0,0), (-1,-1), 'CENTER'),
-    ])) # ← ここをしっかり閉じました
+        ('FONTSIZE', (0,0), (-1,-1), 7.5),
+    ]))
     table.wrapOn(c, width, height)
-    table.drawOn(c, margin, height - 8.2*inch)
+    table.drawOn(c, margin, height - 8.1*inch)
 
-    c.showPage()
-    # --- PAGE 2 ---
+    c.showPage() # --- PAGE 2 ---
     c.setFillColorRGB(0.05, 0.05, 0.05)
     c.rect(0, 0, width, height, fill=True)
     c.setFont("Helvetica-Bold", 14)
@@ -114,7 +145,13 @@ def download_report():
     c.drawString(margin, height - 1.8*inch, "04 // THE GOLD STANDARD STACK")
     
     y = height - 2.3*inch
-    stack = [("Ippodo Matcha", LINKS['matcha'], "Neuro-protection."), ("Suntory NMN", LINKS['nmn'], "DNA repair."), ("Spermidine", LINKS['spermidine'], "Autophagy."), ("EPA / DHA", LINKS['omega3'], "Inflammation control."), ("Zojirushi IH", LINKS['cooker'], "Metabolism.")]
+    stack = [
+        ("Ippodo Matcha", LINKS['matcha'], "Finest L-Theanine source."),
+        ("Suntory NMN", LINKS['nmn'], "99.9% purity for DNA repair."),
+        ("Spermidine", LINKS['spermidine'], "Autophagy inducer."),
+        ("EPA / DHA", LINKS['omega3'], "Inflammation control."),
+        ("Zojirushi IH", LINKS['cooker'], "Metabolism foundation.")
+    ]
     for title, link, desc in stack:
         c.setFont("Helvetica-Bold", 10)
         c.setFillColor(colors.white)
@@ -130,6 +167,5 @@ def download_report():
     return send_file(buffer, as_attachment=True, download_name='ZENGEN_Premium_Report.pdf', mimetype='application/pdf')
 
 if __name__ == '__main__':
-    # Renderのポート設定に対応
     port = int(os.environ.get('PORT', 10000))
     app.run(host='0.0.0.0', port=port)
