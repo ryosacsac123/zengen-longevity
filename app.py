@@ -43,16 +43,13 @@ def create_report(score):
     p.setFillColor(colors.HexColor("#39FF14"))
     p.drawCentredString(width/2, height - 240, "JDI8 SCORE")
     
-    # --- Updated Risk Assessment Logic (3-Tier) ---
+    # --- Risk Assessment Logic (3-Tier) ---
     if score <= 3:
         risk_text = "RISK ASSESSMENT: HIGH"
-        risk_color = colors.red
     elif score <= 6:
         risk_text = "RISK ASSESSMENT: MODERATE"
-        risk_color = colors.orange
     else:
         risk_text = "RISK ASSESSMENT: LOW"
-        risk_color = colors.HexColor("#39FF14")
 
     p.setFont("Helvetica-Bold", 14)
     p.setFillColor(colors.white)
@@ -78,7 +75,7 @@ def create_report(score):
             ["Day", "Focus", "Action"],
             ["Mon", "Autophagy", "Hydration focus. Start with Miso soup to reset."],
             ["Tue", "Microbiome", "Eat Natto at dinner to support mucosa."],
-            ["Wed", "Enzyme", "Add a small Seaweed side to your lunch."],
+            ["Wed", "Enzyme", "Seaweed side dish. Support marine polysaccharide digestion."], # 更新箇所
             ["Thu", "Recovery", "2g Ippodo Matcha. Prioritize L-Theanine."],
             ["Fri", "Omega-3", "Omega-3: Take 1g EPA/DHA supplement."],
             ["Sat", "Metabolism", "HIIT Session. Activate glycolysis."],
