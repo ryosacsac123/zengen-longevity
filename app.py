@@ -43,7 +43,17 @@ def create_report(score):
     p.setFillColor(colors.HexColor("#39FF14"))
     p.drawCentredString(width/2, height - 240, "JDI8 SCORE")
     
-    risk_text = "RISK ASSESSMENT: HIGH" if score <= 4 else "RISK ASSESSMENT: MODERATE"
+    # --- Updated Risk Assessment Logic (3-Tier) ---
+    if score <= 3:
+        risk_text = "RISK ASSESSMENT: HIGH"
+        risk_color = colors.red
+    elif score <= 6:
+        risk_text = "RISK ASSESSMENT: MODERATE"
+        risk_color = colors.orange
+    else:
+        risk_text = "RISK ASSESSMENT: LOW"
+        risk_color = colors.HexColor("#39FF14")
+
     p.setFont("Helvetica-Bold", 14)
     p.setFillColor(colors.white)
     p.drawCentredString(width/2, height - 270, risk_text)
