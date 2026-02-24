@@ -79,7 +79,7 @@ def create_report(score):
             ["Day", "Focus", "Action"],
             ["Mon", "Autophagy", "16:8 Fasting. Break fast with Miso & Seaweed."],
             ["Tue", "Microbiome", "Microbiome Diversity: Mix Natto with Okra/Kimchi."],
-            ["Wed", "Enzyme", "Seaweed Salad. Activate Porphyranase enzyme."],
+            ["Wed", "Enzyme", "Seaweed Salad. Support marine polysaccharide digestion."],
             ["Thu", "Nootropic", "2g Ippodo Matcha. Prioritize L-Theanine."],
             ["Fri", "Omega-3", "Fatty fish (Salmon/Saba) + 1g supplement."],
             ["Sat", "Metabolism", "HIIT Session. Activate glycolysis."],
