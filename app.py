@@ -70,12 +70,13 @@ def create_report(score):
     p.drawString(40, height - 390, "03 // PERSONALIZED PROTOCOL")
 
     # Dynamic Table Data based on Score
+    seaweed_text = "Seaweed side dish. Support marine polysaccharide digestion."
     if score <= 4:
         data = [
             ["Day", "Focus", "Action"],
             ["Mon", "Autophagy", "Hydration focus. Start with Miso soup to reset."],
             ["Tue", "Microbiome", "Eat Natto at dinner to support mucosa."],
-            ["Wed", "Enzyme", "Seaweed side dish. Support marine polysaccharide digestion."], # 更新箇所
+            ["Wed", "Enzyme", seaweed_text],
             ["Thu", "Recovery", "2g Ippodo Matcha. Prioritize L-Theanine."],
             ["Fri", "Omega-3", "Omega-3: Take 1g EPA/DHA supplement."],
             ["Sat", "Metabolism", "HIIT Session. Activate glycolysis."],
@@ -145,6 +146,33 @@ def create_report(score):
 
 # --- 2. Routes ---
 
+# ★ここが追加されたトップページの設定です
+@app.route('/')
+def home():
+    return """
+    <html>
+    <head>
+        <title>ZENGEN AI - Longevity Blueprint</title>
+        <style>
+            body { background-color: #000; color: #39FF14; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; text-align: center;}
+            h1 { font-size: 3rem; margin-bottom: 20px; letter-spacing: 2px; }
+            p { color: #fff; margin-bottom: 30px; font-style: italic; }
+            .links { display: flex; gap: 20px; }
+            a { color: #39FF14; text-decoration: none; border: 1px solid #39FF14; padding: 10px 20px; border-radius: 5px; font-size: 0.9rem; transition: 0.3s; }
+            a:hover { background-color: #39FF14; color: #000; }
+        </style>
+    </head>
+    <body>
+        <h1>ZENGEN AI</h1>
+        <p>Personalized Longevity Protocol Engine</p>
+        <div class="links">
+            <a href="/legal">Commerce Disclosure</a>
+            <a href="https://amzn.to/3ZgMv0Q" target="_blank">Featured: Ippodo Matcha</a>
+        </div>
+    </body>
+    </html>
+    """
+
 @app.route('/download-report')
 def download_report():
     score = int(request.args.get('score', 0))
@@ -156,7 +184,6 @@ def download_report():
         mimetype='application/pdf'
     )
 
-# ここに /legal を移動させ、インデントを左端に揃えます
 @app.route('/legal')
 def legal():
     return """
@@ -187,7 +214,6 @@ def legal():
     </html>
     """
 
-# app.run は必ず一番最後に記述します
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
