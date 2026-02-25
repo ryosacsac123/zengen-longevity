@@ -9,19 +9,18 @@ from reportlab.platypus import Table, TableStyle
 
 app = Flask(__name__)
 
-# Stripe API Key (Renderの環境変数 "STRIPE_SECRET_KEY" から取得)
+# Stripe API Key (RenderのSettings > Environment Variablesで設定)
 stripe.api_key = os.environ.get("STRIPE_SECRET_KEY", "sk_test_placeholder")
 
-# --- 1. PDFエンジン (ZENGEN_Premium_Report_2 (1).pdf を完全再現) ---
+# --- 1. PDFエンジン (完璧なPDFを完全再現) ---
 def create_report(score):
     buffer = io.BytesIO()
     p = canvas.Canvas(buffer, pagesize=A4)
     width, height = A4
 
-    # --- PAGE 1: 診断結果 & パーソナライズド・プロトコル ---
+    # --- PAGE 1: 診断結果 & プロトコル ---
     p.setFillColor(colors.black)
     p.rect(0, 0, width, height, fill=1)
-    
     p.setFont("Helvetica-Bold", 10)
     p.setFillColor(colors.HexColor("#39FF14"))
     p.drawString(40, height - 40, "OFFICIAL LONGEVITY BLUEPRINT")
@@ -79,17 +78,14 @@ def create_report(score):
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1A1A1A")),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor("#39FF14")),
-        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, -1), 9),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 10),
         ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#333333")),
         ('TEXTCOLOR', (0, 1), (-1, -1), colors.white),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
     ]))
     table.wrapOn(p, 40, 420)
     table.drawOn(p, 40, height - 600)
 
-    p.showPage() # --- PAGE 2: THE GOLD STANDARD STACK ---
+    p.showPage()
     p.setFillColor(colors.black)
     p.rect(0, 0, width, height, fill=1)
     p.setFont("Helvetica-Bold", 12)
@@ -98,11 +94,12 @@ def create_report(score):
 
     stacks = [
         ("Ippodo Matcha", "Finest L-Theanine source.", "https://amzn.to/3ZgMv0Q"),
-        ("NMN", "NAD+ precursor for DNA repair and cellular energy.", "https://amzn.to/4qTcOHM"),
+        ("NMN", "NAD+ precursor for DNA repair.", "https://amzn.to/4qTcOHM"),
         ("Spermidine", "Autophagy inducer.", "https://amzn.to/4tYE6j2"),
         ("EPA/DHA", "Inflammation control.", "https://amzn.to/4kRTklz"),
         ("Zojirushi IH", "Metabolism foundation.", "https://amzn.to/4hfC1sA")
     ]
+
     y = height - 80
     for title, desc, link in stacks:
         p.setFont("Helvetica-Bold", 11)
@@ -138,7 +135,7 @@ def home():
             #page2 { transform:translateX(100%); }
             #page3 { transform:translateX(100%); }
             h1 { font-size:6.5rem; letter-spacing:30px; color:var(--neon); font-weight:100; margin:0; text-shadow:0 0 35px var(--neon); cursor:pointer; }
-            .tagline { color:#444; letter-spacing:12px; margin-top:25px; font-size:0.8rem; text-transform:uppercase; font-weight:300; }
+            .tagline { color:#444; letter-spacing:12px; margin-top:25px; font-size:0.8rem; text-transform:uppercase; }
             .card { background:rgba(10,10,10,0.85); border:1px solid #222; padding:55px; border-radius:35px; backdrop-filter:blur(30px); width:560px; box-shadow:0 60px 120px rgba(0,0,0,1); }
             .section-label { color:var(--neon); font-size:0.7rem; letter-spacing:5px; margin-bottom:20px; text-transform:uppercase; border-bottom:1px solid #222; padding-bottom:10px; }
             .q-item { margin-bottom:15px; display:flex; align-items:center; font-size:1.1rem; letter-spacing:1px; color:#ccc; }
@@ -148,10 +145,6 @@ def home():
             .summary-card { text-align: left; background: rgba(57, 255, 20, 0.04); border: 1px dashed #333; padding: 30px; border-radius: 20px; margin-top: 20px; }
             .val-list { list-style: none; padding: 0; color: #888; font-size: 1rem; line-height: 2.2; }
             .val-list span { color: var(--neon); }
-            .disclaimer { font-size:0.65rem; color:#555; line-height:1.6; border-top:1px solid #222; margin-top:30px; padding-top:20px; text-align:justify; }
-            footer { position:fixed; bottom:30px; width:100%; text-align:center; z-index:10; font-size:0.65rem; letter-spacing:4px; }
-            footer a { color:#333; text-decoration:none; margin:0 25px; transition:0.3s; }
-            footer a:hover { color:var(--neon); }
         </style>
     </head>
     <body>
@@ -174,10 +167,6 @@ def home():
                 <div class="section-label" style="margin-top:30px;">02b // INVERSE FACTOR</div>
                 <div class="q-item"><input type="checkbox" class="j-inv"> LOW BEEF/PORK INTAKE</div>
                 <button onclick="move(2,3)" style="width:100%;">Synthesize Protocol</button>
-                <div class="disclaimer">
-                    <strong>ABOUT US:</strong> Developed by Ryoh Sakuma, Hokkaido University Graduate School of Engineering. Rooted in environmental science and biological data architecture.<br><br>
-                    <strong>DISCLAIMER:</strong> This biological engine is for informational purposes only. It is not a medical tool and provides no medical efficacy.
-                </div>
             </div>
         </div>
         <div id="page3" class="screen">
@@ -199,7 +188,6 @@ def home():
                 </form>
             </div>
         </div>
-        <footer><a href="/legal">LEGAL</a><a href="/about">ABOUT US</a></footer>
         <script>
             const canvas = document.getElementById('canvas');
             const ctx = canvas.getContext('2d');
@@ -277,14 +265,6 @@ def download_report():
         return send_file(create_report(score), as_attachment=True, download_name=f"ZENGEN_Official_Report_{score}.pdf", mimetype='application/pdf')
     except Exception as e:
         return f"Internal Error: {str(e)}", 500
-
-@app.route('/about')
-def about():
-    return """<body style="background:#000;color:#fff;padding:80px;font-family:sans-serif;line-height:2.8;"><h1 style="color:#39FF14;letter-spacing:12px;">ABOUT US</h1><p>Curated by Ryoh Sakuma, Hokkaido University Graduate School of Engineering.<br>Environmental Science & Biological Data Architecture.</p><br><a href="/" style="color:#39FF14;text-decoration:none;border:1px solid #39FF14;padding:12px 35px;">BACK</a></body>"""
-
-@app.route('/legal')
-def legal():
-    return """<body style="background:#000;color:#fff;padding:80px;font-family:sans-serif;line-height:2.8;"><h1 style="color:#39FF14;letter-spacing:12px;">LEGAL</h1><p><b>販売業者:</b> 佐久間稜<br><b>所在地:</b> 北海道札幌市北区北13条西8丁目 北海道大学大学院<br><b>価格:</b> $5.00</p><br><a href="/" style="color:#39FF14;text-decoration:none;border:1px solid #39FF14;padding:12px 35px;">BACK</a></body>"""
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
