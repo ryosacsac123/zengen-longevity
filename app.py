@@ -9,8 +9,8 @@ from reportlab.platypus import Table, TableStyle
 
 app = Flask(__name__)
 
-# --- [IMPORTANT] 開発設定 ---
-# 決済をスキップしてPDFを確認したい場合はここを True に、審査に出す際は False にしてください
+# --- [IMPORTANT] 開発・デバッグ設定 ---
+# 決済をスキップしてPDFを確認したい場合はここを True に、本番（審査）に出す際は False にしてください
 DEBUG_MODE = True 
 
 stripe.api_key = os.environ.get("STRIPE_SECRET_KEY", "sk_test_placeholder")
@@ -21,7 +21,7 @@ def create_report(score):
     p = canvas.Canvas(buffer, pagesize=A4)
     width, height = A4
 
-    # [cite_start]PAGE 1: 診断結果 & プロトコル [cite: 7, 8, 9, 10]
+    # PAGE 1: 診断結果 & プロトコル 
     p.setFillColor(colors.black)
     p.rect(0, 0, width, height, fill=1)
     p.setFont("Helvetica-Bold", 10)
@@ -45,12 +45,12 @@ def create_report(score):
 
     p.setFont("Helvetica-Bold", 12)
     p.setFillColor(colors.HexColor("#39FF14"))
-    [cite_start]p.drawString(40, height - 330, "02 // THE JAPANESE GENETIC EDGE") [cite: 11]
+    p.drawString(40, height - 330, "02 // THE JAPANESE GENETIC EDGE")
     p.setFont("Helvetica", 10)
     p.setFillColor(colors.white)
-    [cite_start]p.drawString(40, height - 350, "Nature (2010): Porphyranase enzyme pathway identified.") [cite: 12]
+    p.drawString(40, height - 350, "Nature (2010): Porphyranase enzyme pathway identified.")
 
-    # [cite_start]プロトコルテーブルの復元 [cite: 14]
+    # プロトコルテーブルの復元 [cite: 14]
     data = [["Day", "Focus", "Action"]]
     if score <= 4:
         rows = [
@@ -85,7 +85,7 @@ def create_report(score):
     table.wrapOn(p, 40, 420)
     table.drawOn(p, 40, height - 600)
 
-    # [cite_start]PAGE 2: スタックリスト [cite: 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
+    # PAGE 2: スタックリスト 
     p.showPage()
     p.setFillColor(colors.black)
     p.rect(0, 0, width, height, fill=1)
@@ -155,6 +155,7 @@ def home():
         <canvas id="canvas"></canvas>
         <div id="page1" class="screen">
             <h1 onclick="move(1,2)">ZENGEN</h1>
+            <div style="color:#444; letter-spacing:10px; margin-top:20px; font-size:0.8rem; text-transform:uppercase;">Longevity Architecture</div>
             <button onclick="move(1,2)">Access Analysis</button>
             <div class="disclaimer">ADVICE ONLY. NOT A MEDICAL DIAGNOSIS.</div>
         </div>
