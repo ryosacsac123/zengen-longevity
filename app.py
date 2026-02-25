@@ -1,26 +1,24 @@
+import os
+import io
+import stripe
 from flask import Flask, send_file, request, jsonify, redirect
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from reportlab.platypus import Table, TableStyle
-import os
-import io
-
-# Stripeライブラリの読み込み
-import stripe
 
 app = Flask(__name__)
 
-# Stripe API Keyの設定 (RenderのEnvironment Variablesで設定してください)
+# Stripe API Key (Renderの環境変数 "STRIPE_SECRET_KEY" から取得)
 stripe.api_key = os.environ.get("STRIPE_SECRET_KEY", "sk_test_placeholder")
 
-# --- 1. あなたが「完璧」と言ったPDFエンジン (完全復元) ---
+# --- 1. PDFエンジン (ZENGEN_Premium_Report_2 (1).pdf を完全再現) ---
 def create_report(score):
     buffer = io.BytesIO()
     p = canvas.Canvas(buffer, pagesize=A4)
     width, height = A4
 
-    # --- PAGE 1: 診断結果 & プロトコル ---
+    # --- PAGE 1: 診断結果 & パーソナライズド・プロトコル ---
     p.setFillColor(colors.black)
     p.rect(0, 0, width, height, fill=1)
     
@@ -38,10 +36,10 @@ def create_report(score):
     p.setFillColor(colors.HexColor("#39FF14"))
     p.drawCentredString(width/2, height - 240, "JDI8 SCORE")
     
-    risk = "HIGH" if score <= 4 else "MODERATE"
+    risk_text = "RISK ASSESSMENT: HIGH" if score <= 4 else "RISK ASSESSMENT: MODERATE"
     p.setFont("Helvetica-Bold", 14)
     p.setFillColor(colors.white)
-    p.drawCentredString(width/2, height - 270, f"RISK ASSESSMENT: {risk}")
+    p.drawCentredString(width/2, height - 270, risk_text)
 
     p.setFont("Helvetica-Bold", 12)
     p.setFillColor(colors.HexColor("#39FF14"))
@@ -54,7 +52,6 @@ def create_report(score):
     p.setFillColor(colors.HexColor("#39FF14"))
     p.drawString(40, height - 390, "03 // PERSONALIZED PROTOCOL")
 
-    # テーブルデータの完全復元
     if score <= 4:
         data = [
             ["Day", "Focus", "Action"],
@@ -82,14 +79,17 @@ def create_report(score):
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1A1A1A")),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor("#39FF14")),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 10),
         ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#333333")),
         ('TEXTCOLOR', (0, 1), (-1, -1), colors.white),
-        ('FONTSIZE', (0, 0), (-1, -1), 9),
     ]))
     table.wrapOn(p, 40, 420)
     table.drawOn(p, 40, height - 600)
 
-    p.showPage() # --- PAGE 2: スタックリスト ---
+    p.showPage() # --- PAGE 2: THE GOLD STANDARD STACK ---
     p.setFillColor(colors.black)
     p.rect(0, 0, width, height, fill=1)
     p.setFont("Helvetica-Bold", 12)
@@ -98,7 +98,7 @@ def create_report(score):
 
     stacks = [
         ("Ippodo Matcha", "Finest L-Theanine source.", "https://amzn.to/3ZgMv0Q"),
-        ("NMN", "NAD+ precursor for DNA repair.", "https://amzn.to/4qTcOHM"),
+        ("NMN", "NAD+ precursor for DNA repair and cellular energy.", "https://amzn.to/4qTcOHM"),
         ("Spermidine", "Autophagy inducer.", "https://amzn.to/4tYE6j2"),
         ("EPA/DHA", "Inflammation control.", "https://amzn.to/4kRTklz"),
         ("Zojirushi IH", "Metabolism foundation.", "https://amzn.to/4hfC1sA")
@@ -119,7 +119,7 @@ def create_report(score):
     buffer.seek(0)
     return buffer
 
-# --- 2. ウェブインターフェース ---
+# --- 2. ウェブインターフェース (収束アニメーション & 3画面構成) ---
 
 @app.route('/')
 def home():
@@ -133,37 +133,34 @@ def home():
             :root { --neon: #39FF14; --bg: #000; }
             body { margin:0; overflow:hidden; background:var(--bg); color:#fff; font-family:'Helvetica Neue', sans-serif; }
             #canvas { position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; filter:blur(40px); opacity:0.8; }
-            
             .screen { position:absolute; width:100vw; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:0.9s cubic-bezier(0.8, 0, 0.2, 1); }
             #page1 { transform:translateX(0); }
             #page2 { transform:translateX(100%); }
             #page3 { transform:translateX(100%); }
-
             h1 { font-size:6.5rem; letter-spacing:30px; color:var(--neon); font-weight:100; margin:0; text-shadow:0 0 35px var(--neon); cursor:pointer; }
-            .tagline { color:#444; letter-spacing:12px; margin-top:25px; font-size:0.8rem; text-transform:uppercase; }
-            
+            .tagline { color:#444; letter-spacing:12px; margin-top:25px; font-size:0.8rem; text-transform:uppercase; font-weight:300; }
             .card { background:rgba(10,10,10,0.85); border:1px solid #222; padding:55px; border-radius:35px; backdrop-filter:blur(30px); width:560px; box-shadow:0 60px 120px rgba(0,0,0,1); }
             .section-label { color:var(--neon); font-size:0.7rem; letter-spacing:5px; margin-bottom:20px; text-transform:uppercase; border-bottom:1px solid #222; padding-bottom:10px; }
             .q-item { margin-bottom:15px; display:flex; align-items:center; font-size:1.1rem; letter-spacing:1px; color:#ccc; }
             input[type="checkbox"] { transform:scale(1.6); margin-right:20px; accent-color:var(--neon); cursor:pointer; }
-            
             button { background:transparent; color:var(--neon); border:1px solid var(--neon); padding:20px 70px; font-weight:bold; cursor:pointer; letter-spacing:7px; transition:0.6s; margin-top:40px; text-transform:uppercase; font-size:0.95rem; }
             button:hover { background:var(--neon); color:#000; box-shadow:0 0 55px var(--neon); }
-
             .summary-card { text-align: left; background: rgba(57, 255, 20, 0.04); border: 1px dashed #333; padding: 30px; border-radius: 20px; margin-top: 20px; }
-            .val-list { list-style: none; padding: 0; color: #888; font-size: 0.95rem; line-height: 2; }
+            .val-list { list-style: none; padding: 0; color: #888; font-size: 1rem; line-height: 2.2; }
             .val-list span { color: var(--neon); }
+            .disclaimer { font-size:0.65rem; color:#555; line-height:1.6; border-top:1px solid #222; margin-top:30px; padding-top:20px; text-align:justify; }
+            footer { position:fixed; bottom:30px; width:100%; text-align:center; z-index:10; font-size:0.65rem; letter-spacing:4px; }
+            footer a { color:#333; text-decoration:none; margin:0 25px; transition:0.3s; }
+            footer a:hover { color:var(--neon); }
         </style>
     </head>
     <body>
         <canvas id="canvas"></canvas>
-
         <div id="page1" class="screen">
             <h1 onclick="move(1,2)">ZENGEN</h1>
             <div class="tagline">Biological Architecture</div>
             <button onclick="move(1,2)">Access Analysis</button>
         </div>
-
         <div id="page2" class="screen">
             <div class="card">
                 <div class="section-label">02 // DIETARY INDEX INPUT</div>
@@ -174,14 +171,15 @@ def home():
                 <div class="q-item"><input type="checkbox" class="j"> GREEN & YELLOW VEG</div>
                 <div class="q-item"><input type="checkbox" class="j"> FISH (DAILY)</div>
                 <div class="q-item"><input type="checkbox" class="j"> GREEN TEA (DAILY)</div>
-                
                 <div class="section-label" style="margin-top:30px;">02b // INVERSE FACTOR</div>
                 <div class="q-item"><input type="checkbox" class="j-inv"> LOW BEEF/PORK INTAKE</div>
-                
                 <button onclick="move(2,3)" style="width:100%;">Synthesize Protocol</button>
+                <div class="disclaimer">
+                    <strong>ABOUT US:</strong> Developed by Ryoh Sakuma, Hokkaido University Graduate School of Engineering. Rooted in environmental science and biological data architecture.<br><br>
+                    <strong>DISCLAIMER:</strong> This biological engine is for informational purposes only. It is not a medical tool and provides no medical efficacy.
+                </div>
             </div>
         </div>
-
         <div id="page3" class="screen">
             <div class="card" style="text-align:center; border-color:var(--neon);">
                 <div class="section-label">03 // ANALYSIS COMPLETE</div>
@@ -201,13 +199,12 @@ def home():
                 </form>
             </div>
         </div>
-
+        <footer><a href="/legal">LEGAL</a><a href="/about">ABOUT US</a></footer>
         <script>
             const canvas = document.getElementById('canvas');
             const ctx = canvas.getContext('2d');
             let w, h, orbs = [];
             let state = "dance"; 
-
             function init() {
                 w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight;
                 orbs = [];
@@ -216,7 +213,6 @@ def home():
                     v: {x: (Math.random()-0.5)*0.5, y: (Math.random()-0.5)*0.5}
                 });
             }
-
             function draw() {
                 ctx.clearRect(0,0,w,h);
                 orbs.forEach(o => {
@@ -224,7 +220,8 @@ def home():
                         o.x += o.v.x; o.y += o.v.y;
                         if(o.x<0||o.x>w) o.v.x*=-1; if(o.y<0||o.y>h) o.v.y*=-1;
                     } else {
-                        o.x += (w/2 - o.x) * 0.018; o.y += (h/2 - o.y) * 0.018;
+                        o.x += (w/2 - o.x) * 0.02; o.y += (h/2 - o.y) * 0.02;
+                        o.r += (140 - o.r) * 0.01;
                     }
                     let g = ctx.createRadialGradient(o.x,o.y,0,o.x,o.y,o.r);
                     g.addColorStop(0, 'rgba(57, 255, 20, 0.4)'); g.addColorStop(1, 'rgba(0,0,0,0)');
@@ -233,7 +230,6 @@ def home():
                 requestAnimationFrame(draw);
             }
             window.onresize=init; init(); draw();
-
             function move(f, t) {
                 if(f===1) state = "converge"; 
                 let score = document.querySelectorAll('.j:checked').length + document.querySelectorAll('.j-inv:checked').length;
@@ -251,16 +247,8 @@ def home():
 def create_checkout_session():
     score = request.form.get('score', 0)
     try:
-        # Stripe Checkout Sessionの作成
         checkout_session = stripe.checkout.Session.create(
-            line_items=[{
-                'price_data': {
-                    'currency': 'usd',
-                    'product_data': {'name': 'ZENGEN Longevity Blueprint'},
-                    'unit_amount': 500,
-                },
-                'quantity': 1,
-            }],
+            line_items=[{'price_data': {'currency': 'usd', 'product_data': {'name': 'ZENGEN Longevity Blueprint'}, 'unit_amount': 500}, 'quantity': 1}],
             mode='payment',
             success_url=request.host_url + f'success?score={score}',
             cancel_url=request.host_url,
@@ -290,5 +278,14 @@ def download_report():
     except Exception as e:
         return f"Internal Error: {str(e)}", 500
 
+@app.route('/about')
+def about():
+    return """<body style="background:#000;color:#fff;padding:80px;font-family:sans-serif;line-height:2.8;"><h1 style="color:#39FF14;letter-spacing:12px;">ABOUT US</h1><p>Curated by Ryoh Sakuma, Hokkaido University Graduate School of Engineering.<br>Environmental Science & Biological Data Architecture.</p><br><a href="/" style="color:#39FF14;text-decoration:none;border:1px solid #39FF14;padding:12px 35px;">BACK</a></body>"""
+
+@app.route('/legal')
+def legal():
+    return """<body style="background:#000;color:#fff;padding:80px;font-family:sans-serif;line-height:2.8;"><h1 style="color:#39FF14;letter-spacing:12px;">LEGAL</h1><p><b>販売業者:</b> 佐久間稜<br><b>所在地:</b> 北海道札幌市北区北13条西8丁目 北海道大学大学院<br><b>価格:</b> $5.00</p><br><a href="/" style="color:#39FF14;text-decoration:none;border:1px solid #39FF14;padding:12px 35px;">BACK</a></body>"""
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
