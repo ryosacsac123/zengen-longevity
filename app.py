@@ -1,4 +1,4 @@
-from flask import Flask, send_file, request, jsonify
+from flask import Flask, send_file, request, jsonify, render_template_string
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
@@ -14,44 +14,41 @@ def create_report(score):
     p = canvas.Canvas(buffer, pagesize=A4)
     width, height = A4
 
-    # --- PAGE 1: デザイン & 診断結果 ---
+    # --- PAGE 1: 診断結果 & プロトコル ---
     p.setFillColor(colors.black)
     p.rect(0, 0, width, height, fill=1)
     
     p.setFont("Helvetica-Bold", 10)
     p.setFillColor(colors.HexColor("#39FF14"))
-    p.drawString(40, height - 40, "OFFICIAL LONGEVITY BLUEPRINT") [cite: 7]
+    p.drawString(40, height - 40, "OFFICIAL LONGEVITY BLUEPRINT")
     
-    # スコア円
     p.setStrokeColor(colors.HexColor("#39FF14"))
     p.setLineWidth(3)
     p.circle(width/2, height - 150, 70, stroke=1, fill=0)
     p.setFont("Helvetica-Bold", 40)
     p.setFillColor(colors.white)
-    p.drawCentredString(width/2, height - 165, f"{score}/8") [cite: 8]
+    p.drawCentredString(width/2, height - 165, f"{score}/8")
     p.setFont("Helvetica-Bold", 12)
     p.setFillColor(colors.HexColor("#39FF14"))
-    p.drawCentredString(width/2, height - 240, "JDI8 SCORE") [cite: 9]
+    p.drawCentredString(width/2, height - 240, "JDI8 SCORE")
     
     risk = "HIGH" if score <= 4 else "MODERATE"
     p.setFont("Helvetica-Bold", 14)
     p.setFillColor(colors.white)
-    p.drawCentredString(width/2, height - 270, f"RISK ASSESSMENT: {risk}") [cite: 10]
+    p.drawCentredString(width/2, height - 270, f"RISK ASSESSMENT: {risk}")
 
-    # Section 02: THE JAPANESE GENETIC EDGE
     p.setFont("Helvetica-Bold", 12)
     p.setFillColor(colors.HexColor("#39FF14"))
-    p.drawString(40, height - 330, "02 // THE JAPANESE GENETIC EDGE") [cite: 11]
+    p.drawString(40, height - 330, "02 // THE JAPANESE GENETIC EDGE")
     p.setFont("Helvetica", 10)
     p.setFillColor(colors.white)
-    p.drawString(40, height - 350, "Nature (2010): Porphyranase enzyme pathway identified for marine processing.") [cite: 12]
+    p.drawString(40, height - 350, "Nature (2010): Porphyranase enzyme pathway identified for marine processing.")
 
-    # Section 03: PERSONALIZED PROTOCOL
     p.setFont("Helvetica-Bold", 12)
     p.setFillColor(colors.HexColor("#39FF14"))
-    p.drawString(40, height - 390, "03 // PERSONALIZED PROTOCOL") [cite: 13]
+    p.drawString(40, height - 390, "03 // PERSONALIZED PROTOCOL")
 
-    # 完璧なテーブルデータの復元
+    # テーブルデータの完全復元
     if score <= 4:
         data = [
             ["Day", "Focus", "Action"],
@@ -73,7 +70,7 @@ def create_report(score):
             ["Fri", "Omega-3", "Fatty fish (Salmon/Saba) + 1g supplement."],
             ["Sat", "Metabolism", "HIIT Session. Activate glycolysis."],
             ["Sun", "Rest", "Hot Bath + 5min cold shower for recovery."]
-        ] [cite: 14]
+        ]
 
     table = Table(data, colWidths=[50, 80, 380])
     table.setStyle(TableStyle([
@@ -86,24 +83,23 @@ def create_report(score):
     table.wrapOn(p, 40, 420)
     table.drawOn(p, 40, height - 600)
 
-    p.showPage() # --- PAGE 2: THE GOLD STANDARD STACK ---
+    p.showPage() # --- PAGE 2: スタックリスト ---
     p.setFillColor(colors.black)
     p.rect(0, 0, width, height, fill=1)
-    
     p.setFont("Helvetica-Bold", 12)
     p.setFillColor(colors.HexColor("#39FF14"))
-    p.drawString(40, height - 40, "04 // THE GOLD STANDARD STACK") [cite: 15]
+    p.drawString(40, height - 40, "04 // THE GOLD STANDARD STACK")
 
-    items = [
+    stacks = [
         ("Ippodo Matcha", "Finest L-Theanine source.", "https://amzn.to/3ZgMv0Q"),
-        ("NMN", "NAD+ precursor for DNA repair and cellular energy.", "https://amzn.to/4qTcOHM"),
+        ("NMN", "NAD+ precursor for DNA repair.", "https://amzn.to/4qTcOHM"),
         ("Spermidine", "Autophagy inducer.", "https://amzn.to/4tYE6j2"),
         ("EPA/DHA", "Inflammation control.", "https://amzn.to/4kRTklz"),
         ("Zojirushi IH", "Metabolism foundation.", "https://amzn.to/4hfC1sA")
-    ] [cite: 16-30]
+    ]
 
     y = height - 80
-    for title, desc, link in items:
+    for title, desc, link in stacks:
         p.setFont("Helvetica-Bold", 11)
         p.setFillColor(colors.white)
         p.drawString(40, y, f"> {title}:")
@@ -119,7 +115,7 @@ def create_report(score):
     buffer.seek(0)
     return buffer
 
-# --- 2. プレミアム3画面UI (中央収束アニメーション & 英文免責) ---
+# --- 2. プレミアム3画面UI ＋ 成功ページ ---
 @app.route('/')
 def home():
     return """
@@ -141,17 +137,20 @@ def home():
             h1 { font-size:6rem; letter-spacing:25px; color:var(--neon); font-weight:100; margin:0; text-shadow:0 0 30px var(--neon); cursor:pointer; }
             .tagline { color:#444; letter-spacing:10px; margin-top:20px; font-size:0.8rem; text-transform:uppercase; }
             
-            .card { background:rgba(10,10,10,0.85); border:1px solid #222; padding:50px; border-radius:35px; backdrop-filter:blur(30px); width:520px; box-shadow:0 60px 120px rgba(0,0,0,1); }
+            .card { background:rgba(10,10,10,0.85); border:1px solid #222; padding:50px; border-radius:35px; backdrop-filter:blur(30px); width:540px; box-shadow:0 60px 120px rgba(0,0,0,1); }
             .q-item { margin-bottom:15px; display:flex; align-items:center; font-size:1.1rem; letter-spacing:1px; color:#ccc; }
             input[type="checkbox"] { transform:scale(1.5); margin-right:20px; accent-color:var(--neon); cursor:pointer; }
             
-            button { background:transparent; color:var(--neon); border:1px solid var(--neon); padding:20px 65px; font-weight:bold; cursor:pointer; letter-spacing:6px; transition:0.6s; margin-top:40px; text-transform:uppercase; }
+            button { background:transparent; color:var(--neon); border:1px solid var(--neon); padding:20px 65px; font-weight:bold; cursor:pointer; letter-spacing:6px; transition:0.6s; margin-top:40px; text-transform:uppercase; font-size:0.9rem; }
             button:hover { background:var(--neon); color:#000; box-shadow:0 0 50px var(--neon); }
 
-            .disclaimer { font-size:0.7rem; color:#555; line-height:1.6; border-top:1px solid #222; margin-top:30px; padding-top:20px; text-align:justify; }
-            footer { position:fixed; bottom:30px; width:100%; text-align:center; z-index:10; font-size:0.6rem; letter-spacing:3px; }
-            footer a { color:#333; text-decoration:none; margin:0 20px; transition:0.3s; }
-            footer a:hover { color:var(--neon); }
+            .summary-box { border: 1px dashed var(--neon); padding: 25px; border-radius: 15px; margin: 30px 0; text-align: left; }
+            .summary-title { font-size: 1.4rem; margin-bottom: 20px; letter-spacing: 2px; }
+            .val-list { font-size: 0.9rem; color: #888; list-style: none; padding: 0; }
+            .val-list li { margin-bottom: 12px; }
+            .val-list span { color: var(--neon); }
+
+            .disclaimer { font-size:0.65rem; color:#555; line-height:1.6; border-top:1px solid #222; margin-top:30px; padding-top:20px; text-align:justify; }
         </style>
     </head>
     <body>
@@ -175,10 +174,9 @@ def home():
                 <div class="q-item"><input type="checkbox" class="j"> GREEN TEA (DAILY)</div>
                 <div class="q-item"><input type="checkbox" class="j"> LOW MEAT INTAKE</div>
                 <button onclick="move(2,3)" style="width:100%;">Synthesize</button>
-                
                 <div class="disclaimer">
-                    <strong>ABOUT US:</strong> Developed by Ryoh Sakuma, Hokkaido University Graduate School of Engineering. Rooted in environmental engineering and biological data architecture.<br><br>
-                    <strong>DISCLAIMER:</strong> This service is a biological data engine for informational purposes only. It is not a medical diagnostic tool and does not provide medical efficacy or professional advice. Always consult a physician for health-related decisions.
+                    <strong>ABOUT US:</strong> Developed by Ryoh Sakuma, Hokkaido University. Rooted in environmental science and biological data architecture.<br><br>
+                    <strong>DISCLAIMER:</strong> This is a biological data engine for informational purposes. Not a medical tool. No medical efficacy is claimed.
                 </div>
             </div>
         </div>
@@ -186,18 +184,19 @@ def home():
         <div id="page3" class="screen">
             <div class="card" style="text-align:center; border-color:var(--neon);">
                 <div style="color:var(--neon); font-size:0.7rem; letter-spacing:5px; margin-bottom:20px;">03 // ANALYSIS READY</div>
-                <h2 style="letter-spacing:10px; font-weight:100; font-size:2rem; margin:0;">UNLOCK BLUEPRINT</h2>
-                <p style="color:#666; line-height:2.4; font-size:0.85rem; letter-spacing:2px; margin:35px 0;">
-                    Your longitudinal data is synchronized.<br>Unlock the premium 10-page scientific protocol.
-                </p>
-                <button onclick="toPayment()" style="background:var(--neon); color:#000; width:100%; border:none;">Access Report ($5.00)</button>
+                <div class="summary-box">
+                    <div class="summary-title">Your JDI8 Score: <span id="displayScore" style="color:var(--neon);">0</span>/8</div>
+                    <ul class="val-list">
+                        <li>● <span>7-Day</span> Personalized Protocol for Autophagy</li>
+                        <li>● <span>Porphyranase</span> Enzyme Processing Insights</li>
+                        <li>● <span>Gold Standard</span> Longevity Stack List</li>
+                        <li>● <span>Science-Backed</span> Nature (2010) Evidence</li>
+                    </ul>
+                </div>
+                <p style="color:#666; font-size:0.85rem; letter-spacing:1px; margin-bottom:30px;">Unlock the complete 10-page scientific protocol.</p>
+                <button onclick="toStripe()" style="background:var(--neon); color:#000; width:100%; border:none;">Unlock Full Blueprint ($5.00)</button>
             </div>
         </div>
-
-        <footer>
-            <a href="/legal">LEGAL</a>
-            <a href="/about">ABOUT US</a>
-        </footer>
 
         <script>
             const canvas = document.getElementById('canvas');
@@ -222,7 +221,6 @@ def home():
                         o.x += o.v.x; o.y += o.v.y;
                         if(o.x<0||o.x>w) o.v.x*=-1; if(o.y<0||o.y>h) o.v.y*=-1;
                     } else {
-                        // 中央へ収束
                         o.x += (w/2 - o.x) * 0.02;
                         o.y += (h/2 - o.y) * 0.02;
                     }
@@ -238,30 +236,39 @@ def home():
             function move(f, t) {
                 if(f===1) state = "converge"; 
                 score = document.querySelectorAll('.j:checked').length;
+                document.getElementById('displayScore').innerText = score;
                 document.getElementById('page'+f).style.transform = 'translateX(-100%)';
                 document.getElementById('page'+t).style.transform = 'translateX(0)';
             }
-            function toPayment() {
-                // ここで本来のStripe決済画面へ飛ばす。今はまだ決済を挟まずPDFへ進む場合は修正が必要
-                window.location.href=`/download-report?score=${score}`;
+            function toStripe() {
+                // 本来はStripe Checkoutへ飛ばす。ここでは成功ページへリダイレクト。
+                window.location.href=`/success?score=${score}`;
             }
         </script>
     </body>
     </html>
     """
 
+@app.route('/success')
+def success():
+    score = request.args.get('score', 0)
+    return f"""
+    <body style="background:#000; color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; font-family:sans-serif;">
+        <h2 style="color:#39FF14; letter-spacing:3px;">PAYMENT SUCCESSFUL</h2>
+        <p style="color:#888; margin-bottom:40px;">Your longevity blueprint is ready for processing.</p>
+        <a href="/download-report?score={score}" style="text-decoration:none; background:#39FF14; color:#000; padding:20px 40px; font-weight:bold; border-radius:5px; letter-spacing:1px;">
+            DOWNLOAD OFFICIAL LONGEVITY BLUEPRINT
+        </a>
+    </body>
+    """
+
 @app.route('/download-report')
 def download_report():
-    score = int(request.args.get('score', 0))
-    return send_file(create_report(score), as_attachment=True, download_name=f"ZENGEN_Report.pdf", mimetype='application/pdf')
-
-@app.route('/about')
-def about():
-    return "Curated by Ryoh Sakuma, Hokkaido University. (Full About Us content here)"
-
-@app.route('/legal')
-def legal():
-    return "Commerce Disclosure (佐久間稜 / 北海道大学...)"
+    try:
+        score = int(request.args.get('score', 0))
+        return send_file(create_report(score), as_attachment=True, download_name=f"ZENGEN_Official_Report_{score}.pdf", mimetype='application/pdf')
+    except Exception as e:
+        return f"Internal Error: {str(e)}", 500
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
