@@ -9,8 +9,8 @@ from reportlab.platypus import Table, TableStyle
 
 app = Flask(__name__)
 
-# --- 設定 ---
-# 決済をスキップしてPDFを確認したい場合はここを True にしてください
+# --- [IMPORTANT] 開発設定 ---
+# 決済をスキップしてPDFを確認したい場合はここを True に、審査に出す際は False にしてください
 DEBUG_MODE = True 
 
 stripe.api_key = os.environ.get("STRIPE_SECRET_KEY", "sk_test_placeholder")
@@ -21,7 +21,7 @@ def create_report(score):
     p = canvas.Canvas(buffer, pagesize=A4)
     width, height = A4
 
-    # PAGE 1: 診断結果
+    # [cite_start]PAGE 1: 診断結果 & プロトコル [cite: 7, 8, 9, 10]
     p.setFillColor(colors.black)
     p.rect(0, 0, width, height, fill=1)
     p.setFont("Helvetica-Bold", 10)
@@ -45,11 +45,12 @@ def create_report(score):
 
     p.setFont("Helvetica-Bold", 12)
     p.setFillColor(colors.HexColor("#39FF14"))
-    p.drawString(40, height - 330, "02 // THE JAPANESE GENETIC EDGE")
+    [cite_start]p.drawString(40, height - 330, "02 // THE JAPANESE GENETIC EDGE") [cite: 11]
     p.setFont("Helvetica", 10)
     p.setFillColor(colors.white)
-    p.drawString(40, height - 350, "Nature (2010): Porphyranase enzyme pathway identified.")
+    [cite_start]p.drawString(40, height - 350, "Nature (2010): Porphyranase enzyme pathway identified.") [cite: 12]
 
+    # [cite_start]プロトコルテーブルの復元 [cite: 14]
     data = [["Day", "Focus", "Action"]]
     if score <= 4:
         rows = [
@@ -84,7 +85,7 @@ def create_report(score):
     table.wrapOn(p, 40, 420)
     table.drawOn(p, 40, height - 600)
 
-    # PAGE 2: スタックリスト
+    # [cite_start]PAGE 2: スタックリスト [cite: 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
     p.showPage()
     p.setFillColor(colors.black)
     p.rect(0, 0, width, height, fill=1)
@@ -99,7 +100,6 @@ def create_report(score):
         ("EPA/DHA", "Inflammation control.", "https://amzn.to/4kRTklz"),
         ("Zojirushi IH", "Metabolism foundation.", "https://amzn.to/4hfC1sA")
     ]
-
     y = height - 80
     for title, desc, link in stacks:
         p.setFont("Helvetica-Bold", 11)
@@ -117,7 +117,7 @@ def create_report(score):
     buffer.seek(0)
     return buffer
 
-# --- 2. ウェブインターフェース (収束アニメーション、Inverse Factor、Stripe) ---
+# --- 2. ウェブインターフェース ---
 
 @app.route('/')
 def home():
@@ -130,19 +130,18 @@ def home():
         <title>ZENGEN AI | Longevity</title>
         <style>
             :root {{ --neon: #39FF14; --bg: #000; }}
-            body {{ margin:0; overflow:hidden; background:var(--bg); color:#fff; font-family:'Inter', sans-serif; }}
+            body {{ margin:0; overflow:hidden; background:var(--bg); color:#fff; font-family:sans-serif; }}
             #canvas {{ position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; filter:blur(40px); opacity:0.8; }}
             .screen {{ position:absolute; width:100vw; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:0.9s cubic-bezier(0.8, 0, 0.2, 1); }}
             #page1 {{ transform:translateX(0); }}
             #page2 {{ transform:translateX(100%); }}
             #page3 {{ transform:translateX(100%); }}
-            h1 {{ font-size:6.5rem; letter-spacing:25px; color:var(--neon); font-weight:100; margin:0; text-shadow:0 0 30px var(--neon); cursor:pointer; }}
-            .tagline {{ color:#444; letter-spacing:10px; margin-top:20px; font-size:0.8rem; text-transform:uppercase; }}
-            .card {{ background:rgba(10,10,10,0.85); border:1px solid #222; padding:55px; border-radius:35px; backdrop-filter:blur(30px); width:540px; box-shadow:0 60px 120px #000; position:relative; }}
+            h1 {{ font-size:6.5rem; letter-spacing:30px; color:var(--neon); font-weight:100; margin:0; text-shadow:0 0 35px var(--neon); cursor:pointer; }}
+            .card {{ background:rgba(10,10,10,0.85); border:1px solid #222; padding:55px; border-radius:35px; backdrop-filter:blur(30px); width:560px; box-shadow:0 60px 120px #000; position:relative; }}
             .section-label {{ color:var(--neon); font-size:0.7rem; letter-spacing:5px; margin-bottom:20px; text-transform:uppercase; border-bottom:1px solid #222; padding-bottom:10px; }}
             .q-item {{ margin-bottom:15px; display:flex; align-items:center; font-size:1.1rem; letter-spacing:1px; color:#ccc; }}
-            input[type="checkbox"] {{ transform:scale(1.5); margin-right:20px; accent-color:var(--neon); cursor:pointer; }}
-            button {{ background:transparent; color:var(--neon); border:1px solid var(--neon); padding:20px 65px; font-weight:bold; cursor:pointer; letter-spacing:6px; transition:0.6s; margin-top:40px; text-transform:uppercase; font-size:0.95rem; }}
+            input[type="checkbox"] {{ transform:scale(1.6); margin-right:20px; accent-color:var(--neon); cursor:pointer; }}
+            button {{ background:transparent; color:var(--neon); border:1px solid var(--neon); padding:20px 70px; font-weight:bold; cursor:pointer; letter-spacing:7px; transition:0.6s; margin-top:40px; text-transform:uppercase; font-size:0.95rem; }}
             button:hover {{ background:var(--neon); color:#000; box-shadow:0 0 50px var(--neon); }}
             .summary-box {{ border: 1px dashed var(--neon); padding: 25px; border-radius: 15px; margin: 30px 0; text-align: left; background: rgba(57, 255, 20, 0.04); }}
             .val-list {{ list-style: none; padding: 0; color: #888; font-size: 0.95rem; line-height: 2.2; }}
@@ -156,7 +155,6 @@ def home():
         <canvas id="canvas"></canvas>
         <div id="page1" class="screen">
             <h1 onclick="move(1,2)">ZENGEN</h1>
-            <div class="tagline">Longevity Architecture</div>
             <button onclick="move(1,2)">Access Analysis</button>
             <div class="disclaimer">ADVICE ONLY. NOT A MEDICAL DIAGNOSIS.</div>
         </div>
@@ -173,7 +171,7 @@ def home():
                 <div class="section-label" style="margin-top:30px;">02b // INVERSE FACTOR</div>
                 <div class="q-item"><input type="checkbox" class="j-inv"> LOW BEEF/PORK INTAKE</div>
                 <button onclick="move(2,3)" style="width:100%;">Synthesize</button>
-                <div style="margin-top:25px; font-size:0.7rem; color:#333;">
+                <div style="margin-top:25px; font-size:0.7rem;">
                     <a href="/about" style="color:#333; text-decoration:none;">ABOUT US</a> | 
                     <a href="/legal" style="color:#333; text-decoration:none;">COMMERCE DISCLOSURE</a>
                 </div>
@@ -221,7 +219,7 @@ def home():
                 document.getElementById('dispScore').innerText = s;
                 document.getElementById('page'+f).style.transform = 'translateX(-100%)';
                 document.getElementById('page'+t).style.transform = 'translateX(0)';
-            }
+            }}
             function toPayment() {{
                 let s = document.getElementById('dispScore').innerText;
                 if(debug) {{ window.location.href=`/download-report?score=${{s}}`; }}
@@ -270,7 +268,7 @@ def download_report():
 def about():
     return """<body style="background:#000;color:#fff;padding:80px;font-family:sans-serif;line-height:2.8;">
     <h1 style="color:#39FF14;letter-spacing:10px;">ABOUT US</h1>
-    <p>Curated by Ryoh Sakuma, Hokkaido University Graduate School of Engineering. Biological architecture and longevity protocols.</p>
+    <p>Curated by Ryoh Sakuma, Hokkaido University Graduate School of Engineering. Environment Science & Biological Data Architecture.</p>
     <a href="/" style="color:#39FF14;">BACK</a></body>"""
 
 @app.route('/legal')
