@@ -157,3 +157,32 @@ def download_report():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
+   @app.route('/legal')
+def legal():
+    return """
+    <html>
+    <head>
+        <title>Commerce Disclosure - ZENGEN AI</title>
+        <meta name="robots" content="noindex, nofollow">
+        <style>
+            body { font-family: sans-serif; background-color: #000; color: #fff; padding: 40px; line-height: 1.8; }
+            h1 { color: #39FF14; border-bottom: 1px solid #333; }
+            .label { color: #39FF14; font-weight: bold; width: 150px; display: inline-block; }
+            a { color: #39FF14; text-decoration: none; border: 1px solid #39FF14; padding: 10px; border-radius: 5px; }
+        </style>
+    </head>
+    <body>
+        <h1>特定商取引法に基づく表記</h1>
+        <p><span class="label">販売業者:</span> 佐久間稜</p>
+        <p><span class="label">所在地:</span> 〒060-0813 北海道札幌市北区北13条西8丁目 北海道大学大学院 工学院</p>
+        <p><span class="label">電話番号:</span> 090-6446-6654</p>
+        <p><span class="label">メールアドレス:</span> ryo1ryo2-1103@outlook.jp</p>
+        <p><span class="label">販売価格:</span> $5.00</p>
+        <p><span class="label">支払方法:</span> クレジットカード (Stripe)</p>
+        <p><span class="label">商品引渡時期:</span> 決済完了後、即時にPDFレポートを生成・表示</p>
+        <p><span class="label">返品・返金:</span> デジタルコンテンツの特性上、返品・返金には応じられません。</p>
+        <br><br>
+        <a href="/">診断に戻る / Back to Home</a>
+    </body>
+    </html>
+    """
