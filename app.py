@@ -9,56 +9,56 @@ from reportlab.platypus import Table, TableStyle
 
 app = Flask(__name__)
 
-# --- [LOCK SYSTEM] ---
-# Set to True for Stripe review (locks PDF behind payment).
-# Set to False only if you want the button to skip payment during your own testing.
-STRICT_PAYMENT_GATE = True 
+# --- COMMERCIAL GATEKEEPING ---
+# Set to True for Stripe review. Set to False for your own testing.
+COMMERCIAL_READY = True 
 
 stripe.api_key = os.environ.get("STRIPE_SECRET_KEY", "sk_test_placeholder")
 
-# --- 1. PREMIUM PDF ENGINE (Ryoh Sakuma Edition) ---
+# --- 1. ENHANCED PDF ENGINE (Ryoh Sakuma Design) ---
 def create_report(score):
     buffer = io.BytesIO()
     p = canvas.Canvas(buffer, pagesize=A4)
     width, height = A4
 
-    # --- PAGE 1: BIOMETRIC ARCHITECTURE --- [cite: 43-51]
+    # --- PAGE 1: DIAGNOSIS & ARCHITECTURE --- [cite: 43-51]
     p.setFillColor(colors.black)
     p.rect(0, 0, width, height, fill=1)
+    
     p.setFont("Helvetica-Bold", 12)
     p.setFillColor(colors.HexColor("#39FF14"))
     p.drawString(50, height - 50, "OFFICIAL LONGEVITY BLUEPRINT // ZENGEN AI")
     
-    # Biometric Score Circle [cite: 44, 45]
+    # Biometric Score Circle
     p.setStrokeColor(colors.HexColor("#39FF14"))
     p.setLineWidth(4)
-    p.circle(width/2, height - 180, 85, stroke=1, fill=0)
+    p.circle(width/2, height - 170, 85, stroke=1, fill=0)
     p.setFont("Helvetica-Bold", 55)
     p.setFillColor(colors.white)
-    p.drawCentredString(width/2, height - 200, f"{score}/8")
+    p.drawCentredString(width/2, height - 190, f"{score}/8")
+    
     p.setFont("Helvetica-Bold", 14)
     p.setFillColor(colors.HexColor("#39FF14"))
-    p.drawCentredString(width/2, height - 290, "JDI8 BIOMETRIC SCORE")
+    p.drawCentredString(width/2, height - 280, "JDI8 BIOMETRIC SCORE")
     
-    # Risk Assessment Logic [cite: 4, 27, 46]
     risk = "HIGH" if score <= 3 else "MODERATE" if score <= 6 else "LOW"
     p.setFont("Helvetica-Bold", 18)
     p.setFillColor(colors.white)
-    p.drawCentredString(width/2, height - 330, f"RISK ASSESSMENT: {risk}")
+    p.drawCentredString(width/2, height - 320, f"RISK ASSESSMENT: {risk}")
 
     p.setStrokeColor(colors.HexColor("#333333"))
-    p.line(50, height - 360, width - 50, height - 360)
+    p.line(50, height - 350, width - 50, height - 350)
 
     # Scientific Foundation [cite: 47-49]
     p.setFont("Helvetica-Bold", 14)
     p.setFillColor(colors.HexColor("#39FF14"))
-    p.drawString(50, height - 400, "02 // SCIENTIFIC FOUNDATION")
+    p.drawString(50, height - 390, "02 // SCIENTIFIC FOUNDATION")
     p.setFont("Helvetica", 11)
     p.setFillColor(colors.white)
-    p.drawString(50, height - 425, "Source: Nature (2010). Human gut bacterial metabolism of red seaweed.")
-    p.drawString(50, height - 440, "Porphyranase enzyme pathway specialized for marine polysaccharide processing.")
+    p.drawString(50, height - 415, "Source: Nature (2010). Human gut bacterial metabolism of red seaweed.")
+    p.drawString(50, height - 430, "Porphyranase enzyme pathway specialized for marine polysaccharide processing.")
 
-    # 7-Day Protocol Table [cite: 50, 51]
+    # --- IMPORTANT: PROTOCOL TABLE (Positions adjusted to avoid overlap) --- [cite: 50-51]
     p.setFont("Helvetica-Bold", 14)
     p.setFillColor(colors.HexColor("#39FF14"))
     p.drawString(50, height - 480, "03 // 7-DAY PERSONALIZED PROTOCOL")
@@ -66,7 +66,7 @@ def create_report(score):
     data = [["Day", "Focus", "Action Plan"]]
     if score <= 4:
         rows = [
-            ["Mon", "Autophagy", "Strict 16:8 Fasting. Start with Miso soup to reset."],
+            ["Mon", "Autophagy", "Strict 16:8 Fasting. Start with Miso soup."],
             ["Tue", "Microbiome", "High-density Natto intake for mucosal support."],
             ["Wed", "Enzyme", "Red seaweed integration. Activate Porphyranase."],
             ["Thu", "Recovery", "2g Premium Ippodo Matcha. Prioritize L-Theanine."],
@@ -86,19 +86,21 @@ def create_report(score):
         ]
     for r in rows: data.append(r)
 
-    table = Table(data, colWidths=[60, 90, 340], rowHeights=25)
+    # Y-position (height - 780) is lowered significantly to prevent overlap with Section 03
+    table = Table(data, colWidths=[60, 90, 340], rowHeights=35)
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1A1A1A")),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor("#39FF14")),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
         ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#333333")),
         ('TEXTCOLOR', (0, 1), (-1, -1), colors.white),
-        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('FONTSIZE', (0, 0), (-1, -1), 11),
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
     ]))
     table.wrapOn(p, 50, 420)
-    table.drawOn(p, 50, height - 680)
+    table.drawOn(p, 50, height - 780)
 
-    # --- PAGE 2: THE GOLD STANDARD STACK --- 
+    # --- PAGE 2: THE GOLD STANDARD STACK --- [cite: 52-66]
     p.showPage()
     p.setFillColor(colors.black)
     p.rect(0, 0, width, height, fill=1)
@@ -114,44 +116,40 @@ def create_report(score):
         ("Zojirushi IH Engine", "Standard for consistent glycaemic index control.", "https://amzn.to/4hfC1sA")
     ]
     
-    y = height - 140
+    y = height - 150
     for title, desc, link in stacks:
         p.setStrokeColor(colors.HexColor("#222222"))
-        p.rect(50, y - 55, width - 100, 70, stroke=1, fill=0)
+        p.rect(50, y - 60, width - 100, 80, stroke=1, fill=0)
         p.setFont("Helvetica-Bold", 13)
         p.setFillColor(colors.white)
         p.drawString(65, y, f"> {title}")
         p.setFont("Helvetica", 10)
         p.setFillColor(colors.lightgrey)
-        p.drawString(65, y - 18, desc)
+        p.drawString(65, y - 20, desc)
         p.setFont("Helvetica-Oblique", 9)
         p.setFillColor(colors.HexColor("#39FF14"))
-        p.drawString(65, y - 38, f"Purchase via Amazon: {link}")
-        y -= 90
+        p.drawString(65, y - 45, f"Purchase via Amazon: {link}")
+        y -= 100
     
-    # Footer [cite: 67]
     p.setFont("Helvetica", 8)
     p.setFillColor(colors.HexColor("#444444"))
     p.drawCentredString(width/2, 40, "DEVELOPED BY RYOH SAKUMA // HOKKAIDO UNIVERSITY // ADVICE ONLY")
-    
     p.save()
     buffer.seek(0)
     return buffer
 
-# --- 2. PREMIUM WEB INTERFACE ---
-
 @app.route('/')
 def home():
-    gate_js = "true" if STRICT_PAYMENT_GATE else "false"
+    ready_js = "true" if COMMERCIAL_READY else "false"
     return f"""
     <!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>ZENGEN AI | Longevity Architecture</title>
+        <title>ZENGEN AI | Longevity</title>
         <style>
             :root {{ --neon: #39FF14; --bg: #000; }}
-            body {{ margin:0; overflow:hidden; background:var(--bg); color:#fff; font-family:'Inter', sans-serif; }}
+            body {{ margin:0; overflow:hidden; background:var(--bg); color:#fff; font-family:sans-serif; }}
             #canvas {{ position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; filter:blur(40px); opacity:0.8; }}
             .screen {{ position:absolute; width:100vw; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:0.9s cubic-bezier(0.8, 0, 0.2, 1); }}
             #page1 {{ transform:translateX(0); }}
@@ -160,8 +158,9 @@ def home():
             h1 {{ font-size:6.5rem; letter-spacing:25px; color:var(--neon); font-weight:100; margin:0; text-shadow:0 0 30px var(--neon); cursor:pointer; }}
             .card {{ background:rgba(10,10,10,0.85); border:1px solid #222; padding:55px; border-radius:35px; backdrop-filter:blur(30px); width:540px; box-shadow:0 60px 120px #000; position:relative; }}
             .section-label {{ color:var(--neon); font-size:0.7rem; letter-spacing:5px; margin-bottom:20px; text-transform:uppercase; border-bottom:1px solid #222; padding-bottom:10px; }}
-            .q-item {{ margin-bottom:15px; display:flex; align-items:center; font-size:1.15rem; color:#ccc; cursor:pointer; }}
-            input[type="checkbox"] {{ transform:scale(1.7); margin-right:20px; accent-color:var(--neon); }}
+            .q-item {{ margin-bottom:15px; display:flex; align-items:center; font-size:1.15rem; color:#ccc; }}
+            .q-item label {{ cursor:pointer; width:100%; display:flex; align-items:center; user-select:none; }}
+            input[type="checkbox"] {{ transform:scale(1.7); margin-right:20px; accent-color:var(--neon); pointer-events:auto; }}
             button {{ background:transparent; color:var(--neon); border:1px solid var(--neon); padding:20px 75px; font-weight:bold; cursor:pointer; letter-spacing:6px; transition:0.6s; margin-top:40px; text-transform:uppercase; }}
             button:hover {{ background:var(--neon); color:#000; box-shadow:0 0 50px var(--neon); }}
             .summary-box {{ border-left: 2px solid var(--neon); padding-left: 25px; margin: 35px 0; text-align: left; }}
@@ -169,9 +168,7 @@ def home():
             .high {{ background:rgba(255,0,0,0.2); color:#ff4444; border:1px solid #ff4444; }}
             .mod {{ background:rgba(255,165,0,0.2); color:#ffa500; border:1px solid #ffa500; }}
             .low {{ background:rgba(57,255,20,0.2); color:var(--neon); border:1px solid var(--neon); }}
-            .value-header {{ color:var(--neon); font-size:0.75rem; letter-spacing:3px; margin-top:25px; margin-bottom:10px; font-weight:bold; }}
-            .val-list {{ list-style: none; padding: 0; color: #888; font-size: 0.9rem; line-height: 2.1; }}
-            .val-list b {{ color: #eee; }}
+            .val-list {{ list-style: none; padding: 0; color: #888; font-size: 0.95rem; line-height: 2.1; }}
             .disclaimer {{ position:absolute; bottom:20px; width:100%; text-align:center; font-size:0.55rem; color:#444; letter-spacing:1.1px; }}
         </style>
     </head>
@@ -185,15 +182,15 @@ def home():
         <div id="page2" class="screen">
             <div class="card">
                 <div class="section-label">02 // BIOMETRIC INPUT</div>
-                <div class="q-item" onclick="this.querySelector('input').click()"><input type="checkbox" class="j"> RICE (DAILY)</div>
-                <div class="q-item" onclick="this.querySelector('input').click()"><input type="checkbox" class="j"> MISO SOUP (DAILY)</div>
-                <div class="q-item" onclick="this.querySelector('input').click()"><input type="checkbox" class="j"> SEAWEED (DAILY)</div>
-                <div class="q-item" onclick="this.querySelector('input').click()"><input type="checkbox" class="j"> PICKLES (DAILY)</div>
-                <div class="q-item" onclick="this.querySelector('input').click()"><input type="checkbox" class="j"> GREEN & YELLOW VEG</div>
-                <div class="q-item" onclick="this.querySelector('input').click()"><input type="checkbox" class="j"> FISH (DAILY)</div>
-                <div class="q-item" onclick="this.querySelector('input').click()"><input type="checkbox" class="j"> GREEN TEA (DAILY)</div>
+                <div class="q-item"><label><input type="checkbox" class="j"> RICE (DAILY)</label></div>
+                <div class="q-item"><label><input type="checkbox" class="j"> MISO SOUP (DAILY)</label></div>
+                <div class="q-item"><label><input type="checkbox" class="j"> SEAWEED (DAILY)</label></div>
+                <div class="q-item"><label><input type="checkbox" class="j"> PICKLES (DAILY)</label></div>
+                <div class="q-item"><label><input type="checkbox" class="j"> GREEN & YELLOW VEG</label></div>
+                <div class="q-item"><label><input type="checkbox" class="j"> FISH (DAILY)</label></div>
+                <div class="q-item"><label><input type="checkbox" class="j"> GREEN TEA (DAILY)</label></div>
                 <div class="section-label" style="margin-top:30px;">02b // INVERSE FACTOR</div>
-                <div class="q-item" onclick="this.querySelector('input').click()"><input type="checkbox" class="j-inv"> LOW BEEF/PORK INTAKE</div>
+                <div class="q-item"><label><input type="checkbox" class="j-inv"> LOW BEEF/PORK INTAKE</label></div>
                 <button onclick="move(2,3)" style="width:100%;">Synthesize Protocol</button>
             </div>
             <div class="disclaimer">ADVICE ONLY. NOT A MEDICAL DIAGNOSIS.</div>
@@ -206,25 +203,22 @@ def home():
                     <div id="riskTag" class="risk-tag">ASSESSING...</div>
                     <div style="font-size: 1.6rem; letter-spacing: 2px;">JDI8 Score: <span id="dispScore" style="color:var(--neon); font-weight:bold;">0</span>/8</div>
                     <p id="riskDesc" style="color:#777; font-size:0.9rem; margin-top:10px; line-height:1.6;"></p>
-                    
-                    <div class="value-header">THE FULL BLUEPRINT INCLUDES:</div>
                     <ul class="val-list">
-                        <li>● <b>7-Day Precision Protocol:</b> Tailored meal & habit timings.</li>
-                        <li>● <b>Enzyme Catalyst Guide:</b> How to trigger marine enzyme pathways.</li>
-                        <li>● <b>Architectural Stack:</b> Exclusive links to 99.9% pure NAD+ precursors.</li>
-                        <li>● <b>DNA Repair Guide:</b> Scientific heat & cold exposure protocols.</li>
+                        <li>● <span>7-Day</span> Optimized Biological Protocol</li>
+                        <li>● <span>Porphyranase</span> Enzyme Synthesis Pathway</li>
+                        <li>● <span>Gold Standard</span> Stack for NAD+ Repair</li>
                     </ul>
                 </div>
                 <form id="payForm" action="/create-checkout-session" method="POST">
                     <input type="hidden" name="score" id="scoreInput" value="0">
-                    <button type="submit" id="mainBtn" style="width:100%; border:none; background:var(--neon); color:#000;">Unlock Full Architecture ($5.00)</button>
+                    <button type="submit" id="mainBtn" style="width:100%; border:none; background:var(--neon); color:#000;">Unlock Full Access ($5.00)</button>
                 </form>
                 <div style="margin-top:25px; font-size:0.75rem;"><a href="/about" style="color:#555; text-decoration:none;">ABOUT US</a> | <a href="/legal" style="color:#555; text-decoration:none;">COMMERCE DISCLOSURE</a></div>
             </div>
         </div>
         <script>
             const canvas = document.getElementById('canvas'); const ctx = canvas.getContext('2d');
-            let w, h, orbs = [], state = "dance", strict = {gate_js};
+            let w, h, orbs = [], state = "dance", isCommercial = {ready_js};
             function init() {{
                 w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight;
                 orbs = []; for(let i=0; i<15; i++) orbs.push({{x:Math.random()*w, y:Math.random()*h, r:Math.random()*200+100, v:{{x:(Math.random()-0.5)*0.6, y:(Math.random()-0.5)*0.6}}}});
@@ -245,15 +239,10 @@ def home():
                 document.getElementById('dispScore').innerText = s;
                 document.getElementById('scoreInput').value = s;
                 const tag = document.getElementById('riskTag'); const desc = document.getElementById('riskDesc');
-                if(s <= 3) {{ tag.innerText = "HIGH RISK"; tag.className = "risk-tag high"; desc.innerText = "Your biological data suggests a critical lack of traditional genetic triggers. Immediate protocol implementation recommended."; }}
-                else if(s <= 6) {{ tag.innerText = "MODERATE RISK"; tag.className = "risk-tag mod"; desc.innerText = "Your current dietary index is stable but lacks the specific marine enzyme activation needed for optimal NAD+ repair."; }}
-                else {{ tag.innerText = "LOW RISK"; tag.className = "risk-tag low"; desc.innerText = "Exceptional biological alignment. Use the blueprint to fine-tune your NAD+ precursors and spermine levels."; }}
-                
-                if(!strict) {{
-                    document.getElementById('mainBtn').innerText = "TEST: DOWNLOAD BLUEPRINT";
-                    document.getElementById('payForm').onsubmit = (e) => {{ e.preventDefault(); window.location.href = "/download-report?score=" + s; }};
-                }}
-                
+                if(s <= 3) {{ tag.innerText = "HIGH RISK"; tag.className = "risk-tag high"; desc.innerText = "Biological indicators suggest a lack of traditional genetic triggers. Protocol implementation recommended."; }}
+                else if(s <= 6) {{ tag.innerText = "MODERATE RISK"; tag.className = "risk-tag mod"; desc.innerText = "Dietary index is stable but lacks specific marine enzyme activation for optimal NAD+ repair."; }}
+                else {{ tag.innerText = "LOW RISK"; tag.className = "risk-tag low"; desc.innerText = "Exceptional biological alignment. Blueprint recommended for fine-tuning NAD+ precursors."; }}
+                if(!isCommercial) {{ document.getElementById('mainBtn').innerText = "TEST: DOWNLOAD PDF"; document.getElementById('payForm').onsubmit = (e) => {{ e.preventDefault(); window.location.href = "/download-report?score=" + s; }}; }}
                 document.getElementById('page'+f).style.transform = 'translateX(-100%)';
                 document.getElementById('page'+t).style.transform = 'translateX(0)';
             }}
@@ -262,6 +251,7 @@ def home():
     </html>
     """
 
+# (Rest of the routes /create-checkout-session, /success, /download-report, /about, /legal remain identical)
 @app.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
     score = request.form.get('score', 0)
@@ -281,7 +271,7 @@ def success():
     return f"""
     <body style="background:#000; color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; font-family:sans-serif; margin:0;">
         <h2 style="color:#39FF14; letter-spacing:5px;">PAYMENT SUCCESSFUL</h2>
-        <a href="/download-report?score={score}" style="text-decoration:none; background:#39FF14; color:#000; padding:20px 40px; font-weight:bold; border-radius:5px; letter-spacing:2px; font-size:0.85rem;">
+        <a href="/download-report?score={score}" style="text-decoration:none; background:#39FF14; color:#000; padding:20px 40px; font-weight:bold; border-radius:5px; margin-top:30px;">
             DOWNLOAD OFFICIAL LONGEVITY BLUEPRINT
         </a>
     </body>
@@ -294,17 +284,11 @@ def download_report():
 
 @app.route('/about')
 def about():
-    return """<body style="background:#000;color:#fff;padding:80px;font-family:sans-serif;line-height:2.8;">
-    <h1 style="color:#39FF14;letter-spacing:10px;">ABOUT US</h1>
-    <p>Curated by Ryoh Sakuma, Hokkaido University Graduate School of Engineering. Specialized in biological architecture and longevity protocols through environmental engineering.</p>
-    <a href="/" style="color:#39FF14; text-decoration:none; border:1px solid #39FF14; padding:10px 20px;">BACK</a></body>"""
+    return """<body style="background:#000;color:#fff;padding:80px;font-family:sans-serif;line-height:2.8;"><h1 style="color:#39FF14;">ABOUT US</h1><p>Curated by Ryoh Sakuma, Hokkaido University Graduate School of Engineering.</p><a href="/" style="color:#39FF14;">BACK</a></body>"""
 
 @app.route('/legal')
 def legal():
-    return """<body style="background:#000;color:#fff;padding:80px;font-family:sans-serif;line-height:2.8;">
-    <h1 style="color:#39FF14;letter-spacing:10px;">COMMERCE DISCLOSURE</h1>
-    <p>Merchant: Ryoh Sakuma<br>Location: Kita 13, Nishi 8, Kita-ku, Sapporo, Hokkaido, Japan (Hokkaido University)<br>Price: $5.00 USD<br>Contact: ryo1ryo2-1103@outlook.jp</p>
-    <a href="/" style="color:#39FF14; text-decoration:none; border:1px solid #39FF14; padding:10px 20px;">BACK</a></body>"""
+    return """<body style="background:#000;color:#fff;padding:80px;font-family:sans-serif;line-height:2.8;"><h1 style="color:#39FF14;">COMMERCE DISCLOSURE</h1><p>Merchant: Ryoh Sakuma<br>Location: Sapporo, Japan (Hokkaido University)<br>Price: $5.00 USD<br>Contact: ryo1ryo2-1103@outlook.jp</p><a href="/" style="color:#39FF14;">BACK</a></body>"""
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
