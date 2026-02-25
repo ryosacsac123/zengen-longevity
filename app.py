@@ -143,6 +143,8 @@ def create_report(score):
     buffer.seek(0)
     return buffer
 
+# --- 2. Routes ---
+
 @app.route('/download-report')
 def download_report():
     score = int(request.args.get('score', 0))
@@ -154,10 +156,8 @@ def download_report():
         mimetype='application/pdf'
     )
 
-if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
-   @app.route('/legal')
+# ここに /legal を移動させ、インデントを左端に揃えます
+@app.route('/legal')
 def legal():
     return """
     <html>
@@ -186,3 +186,8 @@ def legal():
     </body>
     </html>
     """
+
+# app.run は必ず一番最後に記述します
+if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
