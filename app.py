@@ -10,18 +10,18 @@ from reportlab.platypus import Table, TableStyle
 app = Flask(__name__)
 
 # --- COMMERCIAL GATEKEEPING ---
-# Set to True for Stripe review. Set to False for your own testing.
+# Set to True for Stripe Review.
 COMMERCIAL_READY = True 
 
 stripe.api_key = os.environ.get("STRIPE_SECRET_KEY", "sk_test_placeholder")
 
-# --- 1. ENHANCED PDF ENGINE (Ryoh Sakuma Design) ---
+# --- 1. PREMIUM PDF ENGINE (Ryoh Sakuma Edition) ---
 def create_report(score):
     buffer = io.BytesIO()
     p = canvas.Canvas(buffer, pagesize=A4)
     width, height = A4
 
-    # --- PAGE 1: DIAGNOSIS & ARCHITECTURE --- [cite: 43-51]
+    # --- PAGE 1: BIOMETRIC ARCHITECTURE ---
     p.setFillColor(colors.black)
     p.rect(0, 0, width, height, fill=1)
     
@@ -49,7 +49,7 @@ def create_report(score):
     p.setStrokeColor(colors.HexColor("#333333"))
     p.line(50, height - 350, width - 50, height - 350)
 
-    # Scientific Foundation [cite: 47-49]
+    # Scientific Foundation
     p.setFont("Helvetica-Bold", 14)
     p.setFillColor(colors.HexColor("#39FF14"))
     p.drawString(50, height - 390, "02 // SCIENTIFIC FOUNDATION")
@@ -58,10 +58,10 @@ def create_report(score):
     p.drawString(50, height - 415, "Source: Nature (2010). Human gut bacterial metabolism of red seaweed.")
     p.drawString(50, height - 430, "Porphyranase enzyme pathway specialized for marine polysaccharide processing.")
 
-    # --- IMPORTANT: PROTOCOL TABLE (Positions adjusted to avoid overlap) --- [cite: 50-51]
+    # 7-Day Protocol Table (Lowered to avoid overlap)
     p.setFont("Helvetica-Bold", 14)
     p.setFillColor(colors.HexColor("#39FF14"))
-    p.drawString(50, height - 480, "03 // 7-DAY PERSONALIZED PROTOCOL")
+    p.drawString(50, height - 470, "03 // 7-DAY PERSONALIZED PROTOCOL")
 
     data = [["Day", "Focus", "Action Plan"]]
     if score <= 4:
@@ -86,12 +86,10 @@ def create_report(score):
         ]
     for r in rows: data.append(r)
 
-    # Y-position (height - 780) is lowered significantly to prevent overlap with Section 03
     table = Table(data, colWidths=[60, 90, 340], rowHeights=35)
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1A1A1A")),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor("#39FF14")),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
         ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#333333")),
         ('TEXTCOLOR', (0, 1), (-1, -1), colors.white),
         ('FONTSIZE', (0, 0), (-1, -1), 11),
@@ -100,7 +98,7 @@ def create_report(score):
     table.wrapOn(p, 50, 420)
     table.drawOn(p, 50, height - 780)
 
-    # --- PAGE 2: THE GOLD STANDARD STACK --- [cite: 52-66]
+    # --- PAGE 2: THE GOLD STANDARD STACK ---
     p.showPage()
     p.setFillColor(colors.black)
     p.rect(0, 0, width, height, fill=1)
@@ -133,10 +131,12 @@ def create_report(score):
     
     p.setFont("Helvetica", 8)
     p.setFillColor(colors.HexColor("#444444"))
-    p.drawCentredString(width/2, 40, "DEVELOPED BY RYOH SAKUMA // HOKKAIDO UNIVERSITY // ADVICE ONLY")
+    p.drawCentredString(width/2, 40, f"DEVELOPED BY RYOH SAKUMA // HOKKAIDO UNIVERSITY // ADVICE ONLY")
     p.save()
     buffer.seek(0)
     return buffer
+
+# --- 2. PREMIUM WEB INTERFACE ---
 
 @app.route('/')
 def home():
@@ -160,7 +160,7 @@ def home():
             .section-label {{ color:var(--neon); font-size:0.7rem; letter-spacing:5px; margin-bottom:20px; text-transform:uppercase; border-bottom:1px solid #222; padding-bottom:10px; }}
             .q-item {{ margin-bottom:15px; display:flex; align-items:center; font-size:1.15rem; color:#ccc; }}
             .q-item label {{ cursor:pointer; width:100%; display:flex; align-items:center; user-select:none; }}
-            input[type="checkbox"] {{ transform:scale(1.7); margin-right:20px; accent-color:var(--neon); pointer-events:auto; }}
+            input[type="checkbox"] {{ transform:scale(1.7); margin-right:20px; accent-color:var(--neon); }}
             button {{ background:transparent; color:var(--neon); border:1px solid var(--neon); padding:20px 75px; font-weight:bold; cursor:pointer; letter-spacing:6px; transition:0.6s; margin-top:40px; text-transform:uppercase; }}
             button:hover {{ background:var(--neon); color:#000; box-shadow:0 0 50px var(--neon); }}
             .summary-box {{ border-left: 2px solid var(--neon); padding-left: 25px; margin: 35px 0; text-align: left; }}
@@ -170,6 +170,9 @@ def home():
             .low {{ background:rgba(57,255,20,0.2); color:var(--neon); border:1px solid var(--neon); }}
             .val-list {{ list-style: none; padding: 0; color: #888; font-size: 0.95rem; line-height: 2.1; }}
             .disclaimer {{ position:absolute; bottom:20px; width:100%; text-align:center; font-size:0.55rem; color:#444; letter-spacing:1.1px; }}
+            footer {{ position:fixed; bottom:30px; width:100%; text-align:center; z-index:10; font-size:0.6rem; letter-spacing:4px; }}
+            footer a {{ color:#333; text-decoration:none; margin:0 20px; transition:0.3s; }}
+            footer a:hover {{ color:var(--neon); }}
         </style>
     </head>
     <body>
@@ -213,9 +216,10 @@ def home():
                     <input type="hidden" name="score" id="scoreInput" value="0">
                     <button type="submit" id="mainBtn" style="width:100%; border:none; background:var(--neon); color:#000;">Unlock Full Access ($5.00)</button>
                 </form>
-                <div style="margin-top:25px; font-size:0.75rem;"><a href="/about" style="color:#555; text-decoration:none;">ABOUT US</a> | <a href="/legal" style="color:#555; text-decoration:none;">COMMERCE DISCLOSURE</a></div>
             </div>
+            <div class="disclaimer">ADVICE ONLY. NOT A MEDICAL DIAGNOSIS.</div>
         </div>
+        <footer><a href="/legal">LEGAL</a><a href="/about">ABOUT US</a></footer>
         <script>
             const canvas = document.getElementById('canvas'); const ctx = canvas.getContext('2d');
             let w, h, orbs = [], state = "dance", isCommercial = {ready_js};
@@ -251,7 +255,6 @@ def home():
     </html>
     """
 
-# (Rest of the routes /create-checkout-session, /success, /download-report, /about, /legal remain identical)
 @app.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
     score = request.form.get('score', 0)
@@ -268,14 +271,7 @@ def create_checkout_session():
 @app.route('/success')
 def success():
     score = request.args.get('score', 0)
-    return f"""
-    <body style="background:#000; color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; font-family:sans-serif; margin:0;">
-        <h2 style="color:#39FF14; letter-spacing:5px;">PAYMENT SUCCESSFUL</h2>
-        <a href="/download-report?score={score}" style="text-decoration:none; background:#39FF14; color:#000; padding:20px 40px; font-weight:bold; border-radius:5px; margin-top:30px;">
-            DOWNLOAD OFFICIAL LONGEVITY BLUEPRINT
-        </a>
-    </body>
-    """
+    return f"""<body style="background:#000; color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; font-family:sans-serif; margin:0;"><h2 style="color:#39FF14;">PAYMENT SUCCESSFUL</h2><a href="/download-report?score={score}" style="text-decoration:none; background:#39FF14; color:#000; padding:20px 40px; font-weight:bold; border-radius:5px;">DOWNLOAD BLUEPRINT</a></body>"""
 
 @app.route('/download-report')
 def download_report():
@@ -284,11 +280,31 @@ def download_report():
 
 @app.route('/about')
 def about():
-    return """<body style="background:#000;color:#fff;padding:80px;font-family:sans-serif;line-height:2.8;"><h1 style="color:#39FF14;">ABOUT US</h1><p>Curated by Ryoh Sakuma, Hokkaido University Graduate School of Engineering.</p><a href="/" style="color:#39FF14;">BACK</a></body>"""
+    return f"""<body style="background:#000;color:#fff;padding:80px;font-family:sans-serif;line-height:2.8;"><h1 style="color:#39FF14;">ABOUT US</h1><p>Curated by Ryoh Sakuma, Hokkaido University Graduate School of Engineering.</p><a href="/" style="color:#39FF14;">BACK</a></body>"""
 
 @app.route('/legal')
 def legal():
-    return """<body style="background:#000;color:#fff;padding:80px;font-family:sans-serif;line-height:2.8;"><h1 style="color:#39FF14;">COMMERCE DISCLOSURE</h1><p>Merchant: Ryoh Sakuma<br>Location: Sapporo, Japan (Hokkaido University)<br>Price: $5.00 USD<br>Contact: ryo1ryo2-1103@outlook.jp</p><a href="/" style="color:#39FF14;">BACK</a></body>"""
+    return """
+    <body style="background:#000;color:#fff;padding:40px;font-family:sans-serif;line-height:1.6;">
+        <h1 style="color:#39FF14;letter-spacing:5px;">COMMERCE DISCLOSURE (Specified Commercial Transactions Act)</h1>
+        <div style="border:1px solid #333; padding:20px; border-radius:10px; max-width:800px;">
+            <table style="width:100%; border-collapse:collapse; color:#ccc;">
+                <tr style="border-bottom:1px solid #222;"><td style="padding:15px; width:30%;"><b>Legal Name</b></td><td style="padding:15px;">Ryoh Sakuma</td></tr>
+                <tr style="border-bottom:1px solid #222;"><td style="padding:15px;"><b>Address</b></td><td style="padding:15px;">Kita 13, Nishi 8, Kita-ku, Sapporo, Hokkaido, 060-8628, Japan (Hokkaido University)</td></tr>
+                <tr style="border-bottom:1px solid #222;"><td style="padding:15px;"><b>Phone Number</b></td><td style="padding:15px;">+81 90-6444-1425 (Available upon request via email)</td></tr>
+                <tr style="border-bottom:1px solid #222;"><td style="padding:15px;"><b>Email Address</b></td><td style="padding:15px;">ryo1ryo2-1103@outlook.jp</td></tr>
+                <tr style="border-bottom:1px solid #222;"><td style="padding:15px;"><b>Head of Operations</b></td><td style="padding:15px;">Ryoh Sakuma</td></tr>
+                <tr style="border-bottom:1px solid #222;"><td style="padding:15px;"><b>Additional Fees</b></td><td style="padding:15px;">None (Internet connection fees are the user's responsibility)</td></tr>
+                <tr style="border-bottom:1px solid #222;"><td style="padding:15px;"><b>Exchanges & Returns</b></td><td style="padding:15px;">Due to the nature of digital content, all sales are final. No refunds or exchanges.</td></tr>
+                <tr style="border-bottom:1px solid #222;"><td style="padding:15px;"><b>Delivery Time</b></td><td style="padding:15px;">The digital report is available for immediate download upon successful payment completion.</td></tr>
+                <tr style="border-bottom:1px solid #222;"><td style="padding:15px;"><b>Accepted Methods</b></td><td style="padding:15px;">Credit Cards (via Stripe)</td></tr>
+                <tr style="border-bottom:1px solid #222;"><td style="padding:15px;"><b>Payment Period</b></td><td style="padding:15px;">Payments are processed immediately at the time of purchase.</td></tr>
+                <tr style="border-bottom:1px solid #222;"><td style="padding:15px;"><b>Price</b></td><td style="padding:15px;">$5.00 USD</td></tr>
+            </table>
+        </div>
+        <p style="margin-top:30px;"><a href="/" style="color:#39FF14; text-decoration:none; border:1px solid #39FF14; padding:10px 20px;">BACK TO ARCHITECTURE</a></p>
+    </body>
+    """
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
