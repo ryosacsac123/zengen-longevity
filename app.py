@@ -10,12 +10,12 @@ from reportlab.platypus import Table, TableStyle
 app = Flask(__name__)
 
 # --- COMMERCIAL GATEKEEPING ---
-# Set to True for Stripe Review.
+# Set to True for Stripe Review. Set to False for local testing.
 COMMERCIAL_READY = True 
 
 stripe.api_key = os.environ.get("STRIPE_SECRET_KEY", "sk_test_placeholder")
 
-# --- 1. PREMIUM PDF ENGINE (Ryoh Sakuma Edition) ---
+# --- 1. PREMIUM PDF ENGINE (Ryo Sakuma Design) ---
 def create_report(score):
     buffer = io.BytesIO()
     p = canvas.Canvas(buffer, pagesize=A4)
@@ -41,6 +41,7 @@ def create_report(score):
     p.setFillColor(colors.HexColor("#39FF14"))
     p.drawCentredString(width/2, height - 280, "JDI8 BIOMETRIC SCORE")
     
+    # Dynamic Risk Assessment based on score
     risk = "HIGH" if score <= 3 else "MODERATE" if score <= 6 else "LOW"
     p.setFont("Helvetica-Bold", 18)
     p.setFillColor(colors.white)
@@ -58,10 +59,10 @@ def create_report(score):
     p.drawString(50, height - 415, "Source: Nature (2010). Human gut bacterial metabolism of red seaweed.")
     p.drawString(50, height - 430, "Porphyranase enzyme pathway specialized for marine polysaccharide processing.")
 
-    # 7-Day Protocol Table (Lowered to avoid overlap)
+    # 7-Day Protocol Table (Lowered to avoid overlap with Header 03)
     p.setFont("Helvetica-Bold", 14)
     p.setFillColor(colors.HexColor("#39FF14"))
-    p.drawString(50, height - 470, "03 // 7-DAY PERSONALIZED PROTOCOL")
+    p.drawString(50, height - 480, "03 // 7-DAY PERSONALIZED PROTOCOL")
 
     data = [["Day", "Focus", "Action Plan"]]
     if score <= 4:
@@ -86,10 +87,12 @@ def create_report(score):
         ]
     for r in rows: data.append(r)
 
+    # Increased rowHeights to 35 to fill space and adjusted drawOn Y
     table = Table(data, colWidths=[60, 90, 340], rowHeights=35)
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1A1A1A")),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor("#39FF14")),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
         ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#333333")),
         ('TEXTCOLOR', (0, 1), (-1, -1), colors.white),
         ('FONTSIZE', (0, 0), (-1, -1), 11),
@@ -129,9 +132,10 @@ def create_report(score):
         p.drawString(65, y - 45, f"Purchase via Amazon: {link}")
         y -= 100
     
+    # Identifies developer as Ryo Sakuma
     p.setFont("Helvetica", 8)
     p.setFillColor(colors.HexColor("#444444"))
-    p.drawCentredString(width/2, 40, f"DEVELOPED BY RYOH SAKUMA // HOKKAIDO UNIVERSITY // ADVICE ONLY")
+    p.drawCentredString(width/2, 40, "DEVELOPED BY RYO SAKUMA // HOKKAIDO UNIVERSITY // ADVICE ONLY") 
     p.save()
     buffer.seek(0)
     return buffer
@@ -169,6 +173,7 @@ def home():
             .mod {{ background:rgba(255,165,0,0.2); color:#ffa500; border:1px solid #ffa500; }}
             .low {{ background:rgba(57,255,20,0.2); color:var(--neon); border:1px solid var(--neon); }}
             .val-list {{ list-style: none; padding: 0; color: #888; font-size: 0.95rem; line-height: 2.1; }}
+            .val-list span {{ color: var(--neon); }}
             .disclaimer {{ position:absolute; bottom:20px; width:100%; text-align:center; font-size:0.55rem; color:#444; letter-spacing:1.1px; }}
             footer {{ position:fixed; bottom:30px; width:100%; text-align:center; z-index:10; font-size:0.6rem; letter-spacing:4px; }}
             footer a {{ color:#333; text-decoration:none; margin:0 20px; transition:0.3s; }}
@@ -180,7 +185,7 @@ def home():
         <div id="page1" class="screen">
             <h1 onclick="move(1,2)">ZENGEN</h1>
             <button onclick="move(1,2)">Initiate Analysis</button>
-            <div class="disclaimer">ADVICE ONLY. NOT A MEDICAL DIAGNOSIS. DEVELOPED BY RYOH SAKUMA.</div>
+            <div class="disclaimer">ADVICE ONLY. NOT A MEDICAL DIAGNOSIS. DEVELOPED BY RYO SAKUMA.</div>
         </div>
         <div id="page2" class="screen">
             <div class="card">
@@ -243,9 +248,9 @@ def home():
                 document.getElementById('dispScore').innerText = s;
                 document.getElementById('scoreInput').value = s;
                 const tag = document.getElementById('riskTag'); const desc = document.getElementById('riskDesc');
-                if(s <= 3) {{ tag.innerText = "HIGH RISK"; tag.className = "risk-tag high"; desc.innerText = "Biological indicators suggest a lack of traditional genetic triggers. Protocol implementation recommended."; }}
-                else if(s <= 6) {{ tag.innerText = "MODERATE RISK"; tag.className = "risk-tag mod"; desc.innerText = "Dietary index is stable but lacks specific marine enzyme activation for optimal NAD+ repair."; }}
-                else {{ tag.innerText = "LOW RISK"; tag.className = "risk-tag low"; desc.innerText = "Exceptional biological alignment. Blueprint recommended for fine-tuning NAD+ precursors."; }}
+                if(s <= 3) {{ tag.innerText = "HIGH RISK"; tag.className = "risk-tag high"; desc.innerText = "Your biological data suggests a critical lack of traditional genetic triggers. Immediate protocol implementation recommended."; }}
+                else if(s <= 6) {{ tag.innerText = "MODERATE RISK"; tag.className = "risk-tag mod"; desc.innerText = "Your current dietary index is stable but lacks the specific marine enzyme activation needed for optimal NAD+ repair."; }}
+                else {{ tag.innerText = "LOW RISK"; tag.className = "risk-tag low"; desc.innerText = "Exceptional biological alignment. Use the blueprint to fine-tune your NAD+ precursors and spermine levels."; }}
                 if(!isCommercial) {{ document.getElementById('mainBtn').innerText = "TEST: DOWNLOAD PDF"; document.getElementById('payForm').onsubmit = (e) => {{ e.preventDefault(); window.location.href = "/download-report?score=" + s; }}; }}
                 document.getElementById('page'+f).style.transform = 'translateX(-100%)';
                 document.getElementById('page'+t).style.transform = 'translateX(0)';
@@ -271,7 +276,7 @@ def create_checkout_session():
 @app.route('/success')
 def success():
     score = request.args.get('score', 0)
-    return f"""<body style="background:#000; color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; font-family:sans-serif; margin:0;"><h2 style="color:#39FF14;">PAYMENT SUCCESSFUL</h2><a href="/download-report?score={score}" style="text-decoration:none; background:#39FF14; color:#000; padding:20px 40px; font-weight:bold; border-radius:5px;">DOWNLOAD BLUEPRINT</a></body>"""
+    return f"""<body style="background:#000; color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; font-family:sans-serif; margin:0;"><h2 style="color:#39FF14; letter-spacing:5px;">PAYMENT SUCCESSFUL</h2><a href="/download-report?score={score}" style="text-decoration:none; background:#39FF14; color:#000; padding:20px 40px; font-weight:bold; border-radius:5px; margin-top:30px;">DOWNLOAD OFFICIAL BLUEPRINT</a></body>"""
 
 @app.route('/download-report')
 def download_report():
@@ -280,8 +285,9 @@ def download_report():
 
 @app.route('/about')
 def about():
-    return f"""<body style="background:#000;color:#fff;padding:80px;font-family:sans-serif;line-height:2.8;"><h1 style="color:#39FF14;">ABOUT US</h1><p>Curated by Ryoh Sakuma, Hokkaido University Graduate School of Engineering.</p><a href="/" style="color:#39FF14;">BACK</a></body>"""
+    return f"""<body style="background:#000;color:#fff;padding:80px;font-family:sans-serif;line-height:2.8;"><h1 style="color:#39FF14;">ABOUT US</h1><p>Curated by Ryo Sakuma, Hokkaido University Graduate School of Engineering.</p><a href="/" style="color:#39FF14;">BACK</a></body>"""
 
+# Finalized Commercial Disclosure with Ryo Sakuma's name and institution
 @app.route('/legal')
 def legal():
     return """
@@ -289,11 +295,11 @@ def legal():
         <h1 style="color:#39FF14;letter-spacing:5px;">COMMERCE DISCLOSURE (Specified Commercial Transactions Act)</h1>
         <div style="border:1px solid #333; padding:20px; border-radius:10px; max-width:800px;">
             <table style="width:100%; border-collapse:collapse; color:#ccc;">
-                <tr style="border-bottom:1px solid #222;"><td style="padding:15px; width:30%;"><b>Legal Name</b></td><td style="padding:15px;">Ryoh Sakuma</td></tr>
+                <tr style="border-bottom:1px solid #222;"><td style="padding:15px; width:30%;"><b>Legal Name</b></td><td style="padding:15px;">Ryo Sakuma</td></tr>
                 <tr style="border-bottom:1px solid #222;"><td style="padding:15px;"><b>Address</b></td><td style="padding:15px;">Kita 13, Nishi 8, Kita-ku, Sapporo, Hokkaido, 060-8628, Japan (Hokkaido University)</td></tr>
                 <tr style="border-bottom:1px solid #222;"><td style="padding:15px;"><b>Phone Number</b></td><td style="padding:15px;">+81 90-6444-1425 (Available upon request via email)</td></tr>
                 <tr style="border-bottom:1px solid #222;"><td style="padding:15px;"><b>Email Address</b></td><td style="padding:15px;">ryo1ryo2-1103@outlook.jp</td></tr>
-                <tr style="border-bottom:1px solid #222;"><td style="padding:15px;"><b>Head of Operations</b></td><td style="padding:15px;">Ryoh Sakuma</td></tr>
+                <tr style="border-bottom:1px solid #222;"><td style="padding:15px;"><b>Head of Operations</b></td><td style="padding:15px;">Ryo Sakuma</td></tr>
                 <tr style="border-bottom:1px solid #222;"><td style="padding:15px;"><b>Additional Fees</b></td><td style="padding:15px;">None (Internet connection fees are the user's responsibility)</td></tr>
                 <tr style="border-bottom:1px solid #222;"><td style="padding:15px;"><b>Exchanges & Returns</b></td><td style="padding:15px;">Due to the nature of digital content, all sales are final. No refunds or exchanges.</td></tr>
                 <tr style="border-bottom:1px solid #222;"><td style="padding:15px;"><b>Delivery Time</b></td><td style="padding:15px;">The digital report is available for immediate download upon successful payment completion.</td></tr>
