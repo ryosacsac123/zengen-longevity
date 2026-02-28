@@ -267,6 +267,7 @@ def create_checkout_session():
         session = stripe.checkout.Session.create(
             line_items=[{'price_data': {'currency': 'usd', 'product_data': {'name': 'ZENGEN Longevity Blueprint'}, 'unit_amount': 500}, 'quantity': 1}],
             mode='payment',
+            locale='en',
             success_url=request.host_url + f'success?score={score}',
             cancel_url=request.host_url,
         )
